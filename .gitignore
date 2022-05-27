@@ -1,0 +1,5 @@
+__pycache__
+*.egg-info/
+venv/
+dist/
+tests/rawtest.py
