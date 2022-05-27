@@ -11,7 +11,7 @@ pip install powerxrd
 ## Usage Example
 
 ```ruby
-import powerxrd as xrd
+import powerxrd.lib.module as xrd
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
