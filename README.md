@@ -24,7 +24,7 @@ x,y = xrd.backsub(x,y)
 plt.plot(x,y)
 plt.xlabel('2 $\\theta$')
 ```
-![alt text](https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true)
+![alt text](https://github.com/andrewrgarcia/powerxrd/blob/main/img/readme.png?raw=true)
 
 ## Contributors
 
