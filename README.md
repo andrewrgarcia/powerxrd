@@ -17,13 +17,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-df = pd.read_csv('/your-path-to-powerxrd/sample1.xy', sep='\t', header=None)   #'https://www.statology.org/pandas-read-text-file/'
+df = pd.read_csv('/your-path-to-powerxrd/sample1.xy', sep='\t', header=None)  
 x,y = np.array(df).T
 x,y = xrd.backsub(x,y)
 
 plt.plot(x,y)
 plt.xlabel('2 $\\theta$')
 ```
+![alt text](https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true)
 
 ## Contributors
 
