@@ -3,3 +3,4 @@ __pycache__
 venv/
 dist/
 tests/rawtest.py
+notes.txt
