@@ -5,25 +5,39 @@ Simple tools to handle powder XRD (and XRD) data
 
 ## Installation
 
-```ruby
+```bash
 pip install powerxrd
 ```
 ## Usage Example
+On your Terminal ("command line"), copy-paste the following lines:
+```python 
+cd Desktop   		# go to your Desktop
+mkdir pxrd		# create a folder called pxrd
 
+cd pxrd 		# go inside that folder
+touch example.py  	# create example.py file
+wget https://raw.githubusercontent.com/andrewrgarcia/powerxrd/main/sample1.xy	# download sample1.xy file
+```
+
+**example.py**:
 ```ruby
-import powerxrd.lib as xrd
+import powerxrd as xrd
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
 
-df = pd.read_csv('/your-path-to-powerxrd/sample1.xy', sep='\t', header=None)  
+df = pd.read_csv('sample1.xy', sep='\t', header=None)  
 x,y = np.array(df).T
 x,y = xrd.backsub(x,y)
 
 plt.plot(x,y)
 plt.xlabel('2 $\\theta$')
+plt.show()
 ```
+
+Run the `example.py` file
+
 ![alt text](https://github.com/andrewrgarcia/powerxrd/blob/main/img/readme.png?raw=true)
 
 ## Contributors
