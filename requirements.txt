@@ -1,4 +1,5 @@
 matplotlib==3.2.2
 numpy==1.18.0
 pandas==1.0.5
+powerxrd==0.0.2
 setuptools==50.3.2
