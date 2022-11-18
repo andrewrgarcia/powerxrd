@@ -1,1 +1,1 @@
-from powerxrd.module import *
+from powerxrd.main import *
