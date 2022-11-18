@@ -68,7 +68,7 @@ Scherrer Width == K*lmda / (FWHM*cos(theta))
 SCHERRER WIDTH: 0.2145261012981139 nm
 '''
 ```
-<img src="https://github.com/andrewrgarcia/powerxrd/blob/main/img/Figure_1.png?raw=true" width="150" >
+<img src="https://github.com/andrewrgarcia/powerxrd/blob/main/img/Figure_1.png?raw=true" width="500" >
 
 
 ```python
@@ -86,7 +86,7 @@ def test_sch():
     plt.show()
 ```
 
-<img src="https://github.com/andrewrgarcia/powerxrd/blob/main/img/Figure_2.png?raw=true" width="150" >
+<img src="https://github.com/andrewrgarcia/powerxrd/blob/main/img/Figure_2.png?raw=true" width="500" >
 
 
 
@@ -106,7 +106,7 @@ def test_mav():
     plt.show()
 ```
 
-<img src="https://github.com/andrewrgarcia/powerxrd/blob/main/img/Figure_3.png?raw=true" width="150" >
+<img src="https://github.com/andrewrgarcia/powerxrd/blob/main/img/Figure_3.png?raw=true" width="500" >
 
 ## Contributors
 
