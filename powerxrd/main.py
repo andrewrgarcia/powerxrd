@@ -112,24 +112,9 @@ class Chart:
 
             return twothet_Ki_deg
 
-    # def emission_lines_plt(self, twothet_range_Ka=[10,20], lmda_Ka = 0.154,lmda_Ki=0.139,show=True):
-
-    #     twothet_Ka_deg, int_Ka, twothet_Ki_deg = Chart(self.x, self.y).\
-    #                                 emission_lines(twothet_range_Ka, lmda_Ka ,lmda_Ki)
-    # ##
-    #     if show:
-    #         plt.vlines(twothet_Ka_deg,0,int_Ka, colors='k', linestyles='solid', \
-    #                 label=r'K$\alpha$; $\theta$ = {} '.format(round(twothet_Ka_deg,2)))
-    #         plt.vlines((twothet_Ka_deg+twothet_Ki_deg)/2,0,int_Ka, colors='k', linestyles='--', label='')
-    #         plt.vlines(twothet_Ki_deg,0,int_Ka, colors='r', linestyles='solid',\
-    #                 label=r'K$\beta$; $\theta$ = {} '.format(round(twothet_Ki_deg,2)))
-    #     else:
-
-    #         return twothet_Ki_deg
-
 
     def gaussfit(self):
-        meanest = self.x[self.y.index(max(self.y))]
+        meanest = self.x[list(self.y).index(max(self.y))]
         sigest = meanest - min(self.x)
     #    print('estimates',meanest,sigest)
         popt, pcov = optimize.curve_fit(funcgauss,self.x,self.y,p0 = [min(self.y),max(self.y),meanest,sigest])
@@ -141,7 +126,7 @@ class Chart:
     #    print('pcov',pcov)
         return popt
         
-    def schw_peakcal(self,K,lambdaKa,xrange=[12,13]):
+    def SchPeak(self,show=True,xrange=[12,13],K=0.9,lambdaKa=0.15406):
 
         x1,x2=xrange
         'xseg and yseg:x and y segments of data in selected xrange'
@@ -169,14 +154,19 @@ class Chart:
         print('K (shape factor): {}\nK-alpha: {} nm \nmax 2-theta: {} degrees'.\
             format(K,lambdaKa,max_twotheta))
         
-        s=scherrer(K,lambdaKa,FWHM,theta)
+        Sch=scherrer(K,lambdaKa,FWHM,theta)
         X,Y = xseg,ysegfit
+
+        print('\nSCHERRER WIDTH: {} nm'.format(Sch))
         
-        return s,X,Y
+        if show:
+            plt.plot(xseg,yseg,color='m')
+
+        return Sch,X,Y
 
 
     '''Function for an "n" point moving average: '''
-    def movnavg(self,n=1):
+    def mav(self,n=1,show=False):
 
         L=int(len(self.x)//n)
         newy=np.zeros(L)
@@ -192,6 +182,12 @@ class Chart:
         for i in range(L):
             newx[i] = self.x[i*n]
 
+        'update'
+        self.x, self.y = newx,newy
+
+        if show:
+            plt.plot(self.x,self.y)
+
         return newx,newy
 
 
@@ -202,7 +198,7 @@ class Chart:
 
 
 
-    def backsub(self,tol=1):
+    def backsub(self,tol=1,show=False):
         '''Background subtraction operation
         inputs:
             x - x-data (e.g. 2Theta values)
@@ -229,6 +225,13 @@ class Chart:
             else:
                 if self.y[(i+lmda)%L] < self.y[i]:
                     backsub_y[(i+lmda)%L] = 0
+        
+        'update'
+        self.x = self.x
+        self.y = backsub_y
+
+        if show:
+            plt.plot(self.x,self.y)
 
         return self.x,backsub_y
     
