@@ -45,7 +45,22 @@ def test_backsub():
     plt.show()
 ```
 
+<img src="https://github.com/andrewrgarcia/powerxrd/blob/main/img/Figure_1.png?raw=true" width="500" >
 
+```python
+def test_sch():
+    
+    df = pd.read_csv('sample1.xy', sep='\t', header=None)   #'https://www.statology.org/pandas-read-text-file/'
+    x,y = np.array(df).T
+
+    chart = xrd.Chart(x,y)
+
+    chart.backsub(tol=1.0,show=True)
+    chart.SchPeak(show=True,xrange=[18,22])
+    plt.xlabel('2 $\\theta$')
+    plt.title('backsub and Scherrer width calculation')
+    plt.show()
+```
 ```python
 '''[OUT]
 -Gaussian fit results-
@@ -68,26 +83,7 @@ Scherrer Width == K*lmda / (FWHM*cos(theta))
 SCHERRER WIDTH: 0.2145261012981139 nm
 '''
 ```
-<img src="https://github.com/andrewrgarcia/powerxrd/blob/main/img/Figure_1.png?raw=true" width="500" >
-
-
-```python
-def test_sch():
-    
-    df = pd.read_csv('sample1.xy', sep='\t', header=None)   #'https://www.statology.org/pandas-read-text-file/'
-    x,y = np.array(df).T
-
-    chart = xrd.Chart(x,y)
-
-    chart.backsub(tol=1.0,show=True)
-    chart.SchPeak(show=True,xrange=[18,22])
-    plt.xlabel('2 $\\theta$')
-    plt.title('backsub and Scherrer width calculation')
-    plt.show()
-```
-
 <img src="https://github.com/andrewrgarcia/powerxrd/blob/main/img/Figure_2.png?raw=true" width="500" >
-
 
 
 ```python
