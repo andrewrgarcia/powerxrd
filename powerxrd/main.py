@@ -1,10 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.optimize as optimize
+import pandas
 
 
-'''interplanar spacing "d_hkl" from Braggs law'''
 def braggs(twotheta,lmda=1.54):
+    '''interplanar spacing "d_hkl" from Braggs law'''
+
     'lambda in Angstroms'
     twothet_rad=twotheta*np.pi/180
     
@@ -40,41 +42,63 @@ def braggs_s(twotheta,lmda=1.54):
     return dhkl
 
 
-'''Scherrer equation'''
 def scherrer(K,lmda,beta,theta):
+    '''Scherrer equation'''
 
     print('Scherrer Width == K*lmda / (FWHM*cos(theta))')
     return K*lmda / (beta*np.cos(theta))    #tau
 
 
-'''Gaussian fit for FWHM'''
 def funcgauss(x,y0,a,mean,sigma):
-    
+    '''Gaussian fit for FWHM'''
+
     return y0+(a/(sigma*np.sqrt(2*np.pi)))*np.exp(-(x-mean)**2/(2*sigma*sigma))
 
-#def funcgauss(x,y0,a,mean,fwhm):
 
-#    return y0 + (a/(fwhm*np.sqrt(np.pi/(4*np.log(2)) )))*np.exp(-(4*np.log(2))*(x-mean)**2/(fwhm*fwhm))
+class Data:
+    def __init__(self,file):
+        '''Data structure.
+        Parameters
+        ----------
+        file : str
+            file name and/or path for XRD file in .xy format
+        '''
+        self.file = file
 
+    
+    def importfile(self):
 
+        df = pandas.read_csv(self.file, sep='\t', header=None)   #'https://www.statology.org/pandas-read-text-file/'
+        x,y = np.array(df).T
+
+        return x,y
 
 class Chart:
 
     def __init__(self,x,y):
-        '''Model structure. Calls `3-D` array to process into 3-D model.
+        '''Chart structure. Constructs x-y XRD data to manipulate and analyze. 
 
         Parameters
         ----------
-        array : np.array(int)
-            array of the third-order populated with discrete, non-zero integers which may represent a voxel block type
-        hashblocks : dict[int]{str, float }
-            a dictionary for which the keys are the integer values on the discrete arrays (above) an the values are the color (str) for the specific key and the alpha for the voxel object (float)
+        x : np.array(float)
+            array with x-data 2-theta values
+        y : np.array(float)
+            array with y-data peak intensity values
+        K : float
+            dimensionless shape factor for Scherrer equation (default 0.9)
+        lambdaKa : float
+            X-ray wavelength of \alpha radiation
+        lambdaKi : float
+            X-ray wavelength of "i" radiation (\beta, \gamma, other)
         '''
-        self.x = x          # x values
-        self.y = y          # y values
+        self.x          = x          # x values
+        self.y          = y          # y values
+        self.K          = 0.9       
+        self.lambdaKa   = 0.15406
+        self.lambdaKi   = 0.139
 
-    '''Local maxima finder'''
     def local_max(self,xrange=[12,13]):
+        '''Local maxima finder'''
         x1,x2=xrange
         xsearch_index=[]
         for n in self.x:
@@ -90,14 +114,19 @@ class Chart:
 
         return max_x, max_y
 
-    '''Emission lines arising from different types of radiation i.e. K_beta radiation
-    wavelength of K_beta == 0.139 nm'''
-    def emission_lines(self, show = True, twothet_range_Ka=[10,20], lmda_Ka = 0.154,lmda_Ki=0.139):
+    # def allpeaks():
 
+    #     s
+    
+
+
+    def emission_lines(self, show = True, twothet_range_Ka=[10,20]):
+        '''Emission lines arising from different types of radiation i.e. K_beta radiation
+        wavelength of K_beta == 0.139 nm'''
         twothet_Ka_deg, int_Ka = Chart(self.x, self.y).local_max(xrange=twothet_range_Ka)
         twothet_Ka=twothet_Ka_deg*np.pi/180
 
-        twothet_Ki = 2*np.arcsin((lmda_Ki/lmda_Ka)*np.sin(twothet_Ka/2))
+        twothet_Ki = 2*np.arcsin((self.lambdaKi/self.lambdaKa)*np.sin(twothet_Ka/2))
         twothet_Ki_deg = twothet_Ki*180/np.pi
 
         # return twothet_Ka_deg, int_Ka, twothet_Ki_deg
@@ -118,7 +147,7 @@ class Chart:
         sigest = meanest - min(self.x)
     #    print('estimates',meanest,sigest)
         popt, pcov = optimize.curve_fit(funcgauss,self.x,self.y,p0 = [min(self.y),max(self.y),meanest,sigest])
-        print('-Gaussian fit results-')
+        print('\n-Gaussian fit results-')
     #    print('amplitude {}\nmean {}\nsigma {}'.format(*popt))
         print('y-shift {}\namplitude {}\nmean {}\nsigma {}'.format(*popt))
 
@@ -126,18 +155,19 @@ class Chart:
     #    print('pcov',pcov)
         return popt
         
-    def SchPeak(self,show=True,xrange=[12,13],K=0.9,lambdaKa=0.15406):
+    def SchPeak(self,show=True,xrange=[12,13]):
 
-        x1,x2=xrange
+        print('\nSchPeak: Scherrer width calc. for peak in range of [{},{}]'.format(*xrange))
+
         'xseg and yseg:x and y segments of data in selected xrange'
         xseg,yseg = [],[]
-        for n in self.x:
-            if n >= x1 and  n <= x2:
+        for n, j in zip(self.x,self.y):
+            if n >= xrange[0] and n <= xrange[1]:
                 xseg.append(n)
-                yseg.append(self.y[list(self.x).index(n)]) 
+                yseg.append(j) 
+
         
-        
-        y0,a,mean,sigma = Chart(self.x, self.y).gaussfit()
+        y0,a,mean,sigma = Chart(xseg,yseg).gaussfit()
         ysegfit = funcgauss(np.array(xseg),y0,a,mean,sigma)
         
         'FULL WIDTH AT HALF MAXIMUM'
@@ -152,9 +182,9 @@ class Chart:
         theta=theta*np.pi/180
 
         print('K (shape factor): {}\nK-alpha: {} nm \nmax 2-theta: {} degrees'.\
-            format(K,lambdaKa,max_twotheta))
+            format(self.K,self.lambdaKa,max_twotheta))
         
-        Sch=scherrer(K,lambdaKa,FWHM,theta)
+        Sch=scherrer(self.K,self.lambdaKa,FWHM,theta)
         X,Y = xseg,ysegfit
 
         print('\nSCHERRER WIDTH: {} nm'.format(Sch))
@@ -165,9 +195,8 @@ class Chart:
         return Sch,X,Y
 
 
-    '''Function for an "n" point moving average: '''
     def mav(self,n=1,show=False):
-
+        '''Function for an "n" point moving average. '''
         L=int(len(self.x)//n)
         newy=np.zeros(L)
         for i in range(L):
@@ -191,9 +220,9 @@ class Chart:
         return newx,newy
 
 
-    '''Calculate relative peak intensity (i.e. comparing one peak to another)'''
     def XRD_int_ratio(self,xR1=[8.88,9.6],xR2=[10.81,11.52]):
-        'XRD b/t two intensities ratio'
+        '''Calculate relative peak intensity (i.e. comparing one peak to another)'''
+        # 'XRD b/t two intensities ratio'
         return Chart(self.x, self.y).local_max(xR2)[1]/Chart(self.x, self.y).local_max(xR1)[1]
 
 
@@ -201,13 +230,11 @@ class Chart:
     def backsub(self,tol=1,show=False):
         '''Background subtraction operation
         inputs:
-            x - x-data (e.g. 2Theta values)
-            y - y-data (e.g. Intensity)
             tol - tolerance (see below)
         outputs: 
             x
             y
-        
+
         This function is a running conditional statement 
         which evaluates whether a small increase 
         in the x-direction will increase the magnitude of the 
@@ -234,5 +261,3 @@ class Chart:
             plt.plot(self.x,self.y)
 
         return self.x,backsub_y
-    
-    
