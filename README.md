@@ -32,13 +32,11 @@ import matplotlib.pyplot as plt
 ```python
 def test_backsub():
     
-    df = pd.read_csv('sample1.xy', sep='\t', header=None)   #'https://www.statology.org/pandas-read-text-file/'
-    x,y = np.array(df).T
-
-    chart = xrd.Chart(x,y)
+    data = xrd.Data('sample1.xy').importfile()
+    chart = xrd.Chart(*data)
 
     chart.emission_lines(show=True)
-    plt.plot(x,y,label='no backsub')
+    plt.plot(*data,label='no backsub')
     plt.plot(*chart.backsub(),label='backsub')
     plt.xlabel('2 $\\theta$')
     plt.legend()
@@ -50,10 +48,8 @@ def test_backsub():
 ```python
 def test_sch():
     
-    df = pd.read_csv('sample1.xy', sep='\t', header=None)   #'https://www.statology.org/pandas-read-text-file/'
-    x,y = np.array(df).T
-
-    chart = xrd.Chart(x,y)
+    data = xrd.Data('sample1.xy').importfile()
+    chart = xrd.Chart(*data)
 
     chart.backsub(tol=1.0,show=True)
     chart.SchPeak(show=True,xrange=[18,22])
@@ -63,24 +59,26 @@ def test_sch():
 ```
 ```python
 '''[OUT]
--Gaussian fit results-
-y-shift 11692.125692754556
-amplitude 2095353.5051754152
-mean 33.62661656530919
-sigma 15.966392102035668
-covariance matrix 
-[[ 8.46197862e+07 -6.62161996e+09 -2.35993662e+03 -2.92153344e+04]
- [-6.62161996e+09  5.72042049e+11  1.44541382e+05  2.60212877e+06]
- [-2.35993662e+03  1.44541382e+05  4.03327433e+00  3.38864534e-01]
- [-2.92153344e+04  2.60212877e+06  3.38864534e-01  1.46624777e+01]]
+SchPeak: Scherrer width calc. for peak in range of [18,22]
 
-FWHM == sigma*2*sqrt(2*ln(2)): 37.597980168697426 degrees
+-Gaussian fit results-
+y-shift 10071.343657500349
+amplitude 498186.5044519722
+mean 19.921493157135924
+sigma 0.1692913723155234
+covariance matrix 
+[[ 2.20553363e+07 -1.98537382e+07 -3.73304414e-08 -4.49772395e+00]
+ [-1.98537382e+07  7.90011550e+07 -2.89541102e-09  1.78971558e+01]
+ [-3.73304414e-08 -2.89541102e-09  9.41177383e-06 -8.26802823e-12]
+ [-4.49772395e+00  1.78971558e+01 -8.26802823e-12  1.03289908e-05]]
+
+FWHM == sigma*2*sqrt(2*ln(2)): 0.39865071697939203 degrees
 K (shape factor): 0.9
 K-alpha: 0.15406 nm 
 max 2-theta: 19.91162984576907 degrees
 Scherrer Width == K*lmda / (FWHM*cos(theta))
 
-SCHERRER WIDTH: 0.2145261012981139 nm
+SCHERRER WIDTH: 20.23261907915097 nm
 '''
 ```
 <img src="https://github.com/andrewrgarcia/powerxrd/blob/main/img/Figure_2.png?raw=true" width="500" >
@@ -89,10 +87,8 @@ SCHERRER WIDTH: 0.2145261012981139 nm
 ```python
 def test_mav():
     
-    df = pd.read_csv('sample1.xy', sep='\t', header=None)   #'https://www.statology.org/pandas-read-text-file/'
-    x,y = np.array(df).T
-
-    chart = xrd.Chart(x,y)
+    data = xrd.Data('sample1.xy').importfile()
+    chart = xrd.Chart(*data)
 
     chart.backsub()
     n = 20
