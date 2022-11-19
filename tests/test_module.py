@@ -1,5 +1,4 @@
 import powerxrd as xrd
-import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -12,13 +11,12 @@ def test_isofncs():
 
 def test_backsub():
     
-    df = pd.read_csv('sample1.xy', sep='\t', header=None)   #'https://www.statology.org/pandas-read-text-file/'
-    x,y = np.array(df).T
+    data = xrd.Data('sample1.xy').importfile()
+    chart = xrd.Chart(*data)
 
-    chart = xrd.Chart(x,y)
-
+    print(data)
     chart.emission_lines(show=True)
-    plt.plot(x,y,label='no backsub')
+    plt.plot(*data,label='no backsub')
     plt.plot(*chart.backsub(),label='backsub')
     plt.xlabel('2 $\\theta$')
     plt.legend()
@@ -27,10 +25,8 @@ def test_backsub():
 
 def test_sch():
     
-    df = pd.read_csv('sample1.xy', sep='\t', header=None)   #'https://www.statology.org/pandas-read-text-file/'
-    x,y = np.array(df).T
-
-    chart = xrd.Chart(x,y)
+    data = xrd.Data('sample1.xy').importfile()
+    chart = xrd.Chart(*data)
 
     chart.backsub(tol=1.0,show=True)
     chart.SchPeak(show=True,xrange=[18,22])
@@ -42,10 +38,8 @@ def test_sch():
 
 def test_mav():
     
-    df = pd.read_csv('sample1.xy', sep='\t', header=None)   #'https://www.statology.org/pandas-read-text-file/'
-    x,y = np.array(df).T
-
-    chart = xrd.Chart(x,y)
+    data = xrd.Data('sample1.xy').importfile()
+    chart = xrd.Chart(*data)
 
     chart.backsub()
     n = 20
