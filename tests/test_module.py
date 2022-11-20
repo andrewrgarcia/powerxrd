@@ -14,7 +14,7 @@ def test_backsub():
     data = xrd.Data('sample1.xy').importfile()
     chart = xrd.Chart(*data)
 
-    print(data)
+    # print(data)
     chart.emission_lines(show=True)
     plt.plot(*data,label='no backsub')
     plt.plot(*chart.backsub(),label='backsub')

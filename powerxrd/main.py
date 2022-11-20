@@ -95,28 +95,28 @@ class Chart:
         self.lambdaKi   = 0.139
 
     def local_max(self,xrange=[12,13]):
-        '''Local maxima finder
+        '''Maximum finder in specified xrange
 
         Parameters
         ----------
         xrange_Ka : [](float)
-            range of x to find local max
+            range of x to find globalmax
         '''
-        x1,x2=xrange
-        xsearch_index=[]
-        for n in self.x:
-            if n >= x1 and  n <= x2:
-                xsearch_index.append(list(self.x).index(n))
 
-        max_y = 0
-        max_x = 0
-        for i in xsearch_index:
-            if self.y[i] > max_y:
-                max_y = self.y[i]
-                max_x = self.x[i]
+        i_l = self.x.searchsorted(xrange[0], 'left')
+        i_r = self.x.searchsorted(xrange[1], 'right')
 
+        'segments of x-y data within specified xrange'
+        xseg = self.x[i_l:i_r]
+        yseg = self.y[i_l:i_r]
+        
+        'find maximum y value within specified range and corresponding x loc.'
+        imax = np.argmax(yseg)
+        max_x = xseg[imax]
+        max_y = yseg[imax]
+
+        print('local_max -- max x: {} max y: {}'.format(max_x,max_y))
         return max_x, max_y
-
 
     def emission_lines(self, show = True, xrange_Ka=[10,20]):
         '''Emission lines arising from different types of radiation i.e. K_beta radiation
@@ -164,10 +164,11 @@ class Chart:
         
         Parameters
         ----------
-        xrange : [](float)
-            range of x-axis (2-theta) where peak to be calculated is found
         show: bool
             show plot of XRD chart
+        xrange : [](float)
+            range of x-axis (2-theta) where peak to be calculated is found
+
         '''
 
         print('\nSchPeak: Scherrer width calc. for peak in range of [{},{}]'.format(*xrange))
@@ -193,13 +194,13 @@ class Chart:
             format(HWMIN))
 
         'scherrer width peak calculations'
-        max_twotheta = xseg[list(yseg).index(max(yseg))]
+        max_x = xseg[list(yseg).index(max(yseg))]
 
-        theta=max_twotheta/2
+        theta=max_x/2
         theta=theta*np.pi/180
 
         print('K (shape factor): {}\nK-alpha: {} nm \nmax 2-theta: {} degrees'.\
-            format(self.K,self.lambdaKa,max_twotheta))
+            format(self.K,self.lambdaKa,max_x))
         
         Sch=scherrer(self.K,self.lambdaKa,FWHM,theta)
         X,Y = xseg,ysegfit
@@ -214,16 +215,17 @@ class Chart:
         right = mean + HWMIN 
 
         # return Sch,X,Y
-        return max_twotheta, Sch, left,right
+        return max_x, max(yseg), Sch, left,right
 
     def allpeaks_recur(self,show = True, left=0, right=1, tol=0.2,schpeaks=[]):
         '''recursion component function for main allpeaks function below'''
+        print('left right',left,right)
         maxx, maxy = Chart(self.x, self.y).local_max(xrange=[left,right])
 
-        Sch_x, Sch, l,r = Chart(self.x, self.y).SchPeak(show=show,xrange=[maxx-0.5,maxx+0.5])
+        Sch_x, Sch_y, Sch, l,r = Chart(self.x, self.y).SchPeak(show=show,xrange=[maxx-0.5,maxx+0.5])
 
         # self.schpeaks.append(Sch)
-        schpeaks.append([Sch_x,Sch])
+        schpeaks.append([Sch_x,Sch_y,Sch])
         peak_max = maxy
 
         if peak_max > tol*max(self.y):
@@ -231,7 +233,7 @@ class Chart:
             Chart(self.x, self.y).allpeaks_recur(True, left, l,tol,schpeaks)
 
 
-    def allpeaks(self, tol=0.2, show = True):
+    def allpeaks(self, tol=0.5, show = True):
         '''Driver code for allpeaks recursion : Automated Scherrer width calculation of all peaks
         
         Parameters
@@ -253,12 +255,18 @@ class Chart:
 
         print('\nallpeaks : Automated Scherrer width calculation of all peaks'+\
              ' [within a certain tolerance]\nSUMMARY:')
+        print('2-theta / deg, \t Intensity, \t Sch width / nm')
+
+        # for i in schpeaks_:
+        #     print('2-theta: {} deg - Sch width: {} nm'.format(*i))
 
         sortidcs = np.argsort(np.array(schpeaks_).T[0])
         # print(sortidcs)
         for i in sortidcs:
-            print('2-theta: {} deg - Sch width: {} nm'.format(*schpeaks_[i]))
-    
+            print('{}, \t  {}, \t  {} '.format(*schpeaks_[i]))
+
+
+
 
 
     def mav(self,n=1,show=False):
