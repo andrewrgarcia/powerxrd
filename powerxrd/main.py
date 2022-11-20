@@ -95,7 +95,13 @@ class Chart:
         self.lambdaKi   = 0.139
 
     def local_max(self,xrange=[12,13]):
-        '''Local maxima finder'''
+        '''Local maxima finder
+
+        Parameters
+        ----------
+        xrange_Ka : [](float)
+            range of x to find local max
+        '''
         x1,x2=xrange
         xsearch_index=[]
         for n in self.x:
@@ -110,13 +116,20 @@ class Chart:
                 max_x = self.x[i]
 
         return max_x, max_y
-    
 
 
-    def emission_lines(self, show = True, twothet_range_Ka=[10,20]):
+    def emission_lines(self, show = True, xrange_Ka=[10,20]):
         '''Emission lines arising from different types of radiation i.e. K_beta radiation
-        wavelength of K_beta == 0.139 nm'''
-        twothet_Ka_deg, int_Ka = Chart(self.x, self.y).local_max(xrange=twothet_range_Ka)
+        wavelength of K_beta == 0.139 nm
+        
+        Parameters
+        ----------
+        show: bool
+            show plot of XRD chart
+        xrange_Ka : [](float)
+            range of x-axis (2-theta) for K_alpha radiation
+        '''
+        twothet_Ka_deg, int_Ka = Chart(self.x, self.y).local_max(xrange=xrange_Ka)
         twothet_Ka=twothet_Ka_deg*np.pi/180
 
         twothet_Ki = 2*np.arcsin((self.lambdaKi/self.lambdaKa)*np.sin(twothet_Ka/2))
@@ -144,8 +157,18 @@ class Chart:
         print('y-shift {}\namplitude {}\nmean {}\nsigma {}'.format(*popt))
         print('covariance matrix \n{}'.format(pcov))
         return popt
+
         
     def SchPeak(self,show=True,xrange=[12,13]):
+        '''Scherrer width calculation for peak within a specified range
+        
+        Parameters
+        ----------
+        xrange : [](float)
+            range of x-axis (2-theta) where peak to be calculated is found
+        show: bool
+            show plot of XRD chart
+        '''
 
         print('\nSchPeak: Scherrer width calc. for peak in range of [{},{}]'.format(*xrange))
 
@@ -194,7 +217,7 @@ class Chart:
         return max_twotheta, Sch, left,right
 
     def allpeaks_recur(self,show = True, left=0, right=1, tol=0.2,schpeaks=[]):
-
+        '''recursion component function for main allpeaks function below'''
         maxx, maxy = Chart(self.x, self.y).local_max(xrange=[left,right])
 
         Sch_x, Sch, l,r = Chart(self.x, self.y).SchPeak(show=show,xrange=[maxx-0.5,maxx+0.5])
@@ -209,7 +232,16 @@ class Chart:
 
 
     def allpeaks(self, tol=0.2, show = True):
-        '''Driver code for allpeaks recursion. This is what must be called'''
+        '''Driver code for allpeaks recursion : Automated Scherrer width calculation of all peaks
+        
+        Parameters
+        ----------
+        tol : float
+            tolerance for recursion - tol relates to the minimum peak height to be 
+            calculated as a percent of maximum peak in chart i.e. peak_max > tol*max(self.y)
+        show: bool
+            show plot of XRD chart
+        '''
 
         #init xrange [left, right]
         left = min(self.x)
