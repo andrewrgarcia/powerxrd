@@ -35,7 +35,7 @@ def test_backsub():
     data = xrd.Data('sample1.xy').importfile()
     chart = xrd.Chart(*data)
 
-    chart.emission_lines(show=True)
+    chart.emission_lines(xrange_Ka=[10,20], show=True)
     plt.plot(*data,label='no backsub')
     plt.plot(*chart.backsub(),label='backsub')
     plt.xlabel('2 $\\theta$')
@@ -52,7 +52,7 @@ def test_sch():
     chart = xrd.Chart(*data)
 
     chart.backsub(tol=1.0,show=True)
-    chart.SchPeak(show=True,xrange=[18,22])
+    chart.SchPeak(xrange=[18,22],show=True)
     plt.xlabel('2 $\\theta$')
     plt.title('backsub and Scherrer width calculation')
     plt.show()
@@ -90,13 +90,14 @@ def test_allpeaks():
     chart = xrd.Chart(*data)
 
     chart.backsub(tol=1.0,show=True)
-    chart.allpeaks(tol=0.2,show=True)
+    chart.allpeaks(tols=(0.2,0.8),show=True)
     plt.xlabel('2 $\\theta$')
     plt.suptitle('backsub & Automated Scherrer width calculation of all peaks*')
     plt.show()
 ```
 ```python
 '''[OUT]
+
 .
 .
 .
@@ -104,18 +105,18 @@ def test_allpeaks():
 allpeaks : Automated Scherrer width calculation of all peaks [within a certain tolerance]
 SUMMARY:
 2-theta / deg, 	 Intensity, 	 Sch width / nm
-10.842851187995, 	  168253.24331045512, 	  8.941734253261906 
-19.91162984576907, 	  1173162.1712873918, 	  19.506346638418783 
-27.037098791162983, 	  106100.29651133435, 	  10.82238857760865 
-29.19633180491872, 	  612236.4986085768, 	  12.19498841711745 
-35.488953730721136, 	  85476.80399923288, 	  16.215930196133126 
-38.45018757815757, 	  878296.1296163809, 	  14.81225507944928 
-40.45518966235932, 	  72528.3080639828, 	  50.49857930719013 
-47.704043351396415, 	  1311776.3933334802, 	  20.034855818080402 
-75.52730304293456, 	  167210.87548438687, 	  9.010130859537554 
+10.842851187995, 	  168253.24331045512, 	  9.441628912735878 
+19.91162984576907, 	  1173162.1712873918, 	  20.135492565092957 
+27.037098791162983, 	  106100.29651133435, 	  11.637934653748315 
+29.19633180491872, 	  612236.4986085768, 	  14.141811760734479 
+35.488953730721136, 	  85476.80399923288, 	  18.062742760350677 
+38.45018757815757, 	  878296.1296163809, 	  16.688459614982563 
+40.45518966235932, 	  72528.3080639828, 	  861.4498530251062 
+47.704043351396415, 	  1311776.3933334802, 	  20.745821993861888 
+75.52730304293456, 	  167210.87548438687, 	  11.141240095107339 
 '''
 ```
-<img src="https://github.com/andrewrgarcia/powerxrd/blob/main/img/Figure_4.png?raw=true" width="500" >
+<img src="https://github.com/andrewrgarcia/powerxrd/blob/main/img/Figure_3.png?raw=true" width="500" >
 
 ```python
 def test_mav():
@@ -131,7 +132,7 @@ def test_mav():
     plt.show()
 ```
 
-<img src="https://github.com/andrewrgarcia/powerxrd/blob/main/img/Figure_3.png?raw=true" width="500" >
+<img src="https://github.com/andrewrgarcia/powerxrd/blob/main/img/Figure_4.png?raw=true" width="500" >
 
 ## Contributors
 

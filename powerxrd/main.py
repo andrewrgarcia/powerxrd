@@ -118,7 +118,7 @@ class Chart:
         print('local_max -- max x: {} max y: {}'.format(max_x,max_y))
         return max_x, max_y
 
-    def emission_lines(self, show = True, xrange_Ka=[10,20]):
+    def emission_lines(self, xrange_Ka=[10,20], show = True):
         '''Emission lines arising from different types of radiation i.e. K_beta radiation
         wavelength of K_beta == 0.139 nm
         
@@ -159,16 +159,15 @@ class Chart:
         return popt
 
         
-    def SchPeak(self,show=True,xrange=[12,13]):
+    def SchPeak(self,xrange=[12,13],show=True):
         '''Scherrer width calculation for peak within a specified range
         
         Parameters
         ----------
-        show: bool
-            show plot of XRD chart
         xrange : [](float)
             range of x-axis (2-theta) where peak to be calculated is found
-
+        show: bool
+            show plot of XRD chart
         '''
 
         print('\nSchPeak: Scherrer width calc. for peak in range of [{},{}]'.format(*xrange))
@@ -217,30 +216,33 @@ class Chart:
         # return Sch,X,Y
         return max_x, max(yseg), Sch, left,right
 
-    def allpeaks_recur(self,show = True, left=0, right=1, tol=0.2,schpeaks=[]):
+    def allpeaks_recur(self,left=0, right=1, tols=(0.2,0.8),schpeaks=[],show = True):
         '''recursion component function for main allpeaks function below'''
         print('left right',left,right)
         maxx, maxy = Chart(self.x, self.y).local_max(xrange=[left,right])
 
-        Sch_x, Sch_y, Sch, l,r = Chart(self.x, self.y).SchPeak(show=show,xrange=[maxx-0.5,maxx+0.5])
+        tol_h, dist_top = tols        
+
+        Sch_x, Sch_y, Sch, l,r = Chart(self.x, self.y).SchPeak(xrange=[maxx-dist_top,maxx+dist_top],show=show)
 
         # self.schpeaks.append(Sch)
         schpeaks.append([Sch_x,Sch_y,Sch])
         peak_max = maxy
 
-        if peak_max > tol*max(self.y):
-            Chart(self.x, self.y).allpeaks_recur(True, r, right,tol,schpeaks)
-            Chart(self.x, self.y).allpeaks_recur(True, left, l,tol,schpeaks)
+        if peak_max > tol_h*max(self.y):
+            Chart(self.x, self.y).allpeaks_recur(r, right,tols,schpeaks,True)
+            Chart(self.x, self.y).allpeaks_recur(left, l,tols,schpeaks,True)
 
 
-    def allpeaks(self, tol=0.2, show = True):
+    def allpeaks(self, tols=(0.2,0.8), show = True):
         '''Driver code for allpeaks recursion : Automated Scherrer width calculation of all peaks
         
         Parameters
         ----------
-        tol : float
-            tolerance for recursion - tol relates to the minimum peak height to be 
-            calculated as a percent of maximum peak in chart i.e. peak_max > tol*max(self.y)
+        tols : (float, float)
+            tolerances for recursion 
+            tol[0]: Minimum peak height to be calculated as a percent of maximum peak in chart (default=0.2 [20% of global maximum])
+            tol[1]: Distance from top of peak to its tail (default=0.8)
         show: bool
             show plot of XRD chart
         '''
@@ -250,7 +252,7 @@ class Chart:
         right = max(self.x)
         schpeaks_ = []
 
-        Chart(self.x, self.y).allpeaks_recur(True, left, right, tol, schpeaks_)
+        Chart(self.x, self.y).allpeaks_recur(left, right, tols, schpeaks_, True)
 
 
         print('\nallpeaks : Automated Scherrer width calculation of all peaks'+\

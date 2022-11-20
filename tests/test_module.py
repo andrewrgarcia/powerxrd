@@ -14,8 +14,7 @@ def test_backsub():
     data = xrd.Data('sample1.xy').importfile()
     chart = xrd.Chart(*data)
 
-    # print(data)
-    chart.emission_lines(show=True)
+    chart.emission_lines(xrange_Ka=[10,20], show=True)
     plt.plot(*data,label='no backsub')
     plt.plot(*chart.backsub(),label='backsub')
     plt.xlabel('2 $\\theta$')
@@ -29,7 +28,7 @@ def test_sch():
     chart = xrd.Chart(*data)
 
     chart.backsub(tol=1.0,show=True)
-    chart.SchPeak(show=True,xrange=[18,22])
+    chart.SchPeak(xrange=[18,22],show=True)
     plt.xlabel('2 $\\theta$')
     plt.title('backsub and Scherrer width calculation')
     plt.show()
@@ -41,7 +40,7 @@ def test_allpeaks():
     chart = xrd.Chart(*data)
 
     chart.backsub(tol=1.0,show=True)
-    chart.allpeaks(tol=0.2,show=True)
+    chart.allpeaks(tols=(0.2,0.8),show=True)
     plt.xlabel('2 $\\theta$')
     plt.suptitle('backsub & Automated Scherrer width calculation of all peaks*')
     plt.show()
