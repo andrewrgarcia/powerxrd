@@ -83,6 +83,38 @@ SCHERRER WIDTH: 20.23261907915097 nm
 ```
 <img src="https://github.com/andrewrgarcia/powerxrd/blob/main/img/Figure_2.png?raw=true" width="500" >
 
+```python
+def test_allpeaks():
+    
+    data = xrd.Data('sample1.xy').importfile()
+    chart = xrd.Chart(*data)
+
+    chart.backsub(tol=1.0,show=True)
+    chart.allpeaks(tol=0.2,show=True)
+    plt.xlabel('2 $\\theta$')
+    plt.suptitle('backsub & Automated Scherrer width calculation of all peaks*')
+    plt.show()
+```
+```python
+'''[OUT]
+.
+.
+.
+
+allpeaks : Automated Scherrer width calculation of all peaks [within a certain tolerance]
+SUMMARY:
+2-theta: 10.842851187995 deg - Sch width: 8.941734253261906 nm
+2-theta: 19.91162984576907 deg - Sch width: 19.506346638418783 nm
+2-theta: 27.037098791162983 deg - Sch width: 10.82238857760865 nm
+2-theta: 29.19633180491872 deg - Sch width: 12.19498841711745 nm
+2-theta: 35.488953730721136 deg - Sch width: 16.215930196133126 nm
+2-theta: 38.45018757815757 deg - Sch width: 14.81225507944928 nm
+2-theta: 40.45518966235932 deg - Sch width: 50.49857930719013 nm
+2-theta: 47.704043351396415 deg - Sch width: 20.034855818080402 nm
+2-theta: 75.52730304293456 deg - Sch width: 9.010130859537554 nm
+'''
+```
+<img src="https://github.com/andrewrgarcia/powerxrd/blob/main/img/Figure_4.png?raw=true" width="500" >
 
 ```python
 def test_mav():

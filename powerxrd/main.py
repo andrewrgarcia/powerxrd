@@ -38,20 +38,17 @@ def braggs_s(twotheta,lmda=1.54):
         dhkl = lmda /(2*np.sin(twothet_rad/2))
         dhkl = np.round(dhkl,2)
     
-
     return dhkl
 
 
 def scherrer(K,lmda,beta,theta):
     '''Scherrer equation'''
-
     print('Scherrer Width == K*lmda / (FWHM*cos(theta))')
     return K*lmda / (beta*np.cos(theta))    #tau
 
 
 def funcgauss(x,y0,a,mean,sigma):
-    '''Gaussian fit for FWHM'''
-
+    '''Gaussian equation'''
     return y0+(a/(sigma*np.sqrt(2*np.pi)))*np.exp(-(x-mean)**2/(2*sigma*sigma))
 
 
@@ -113,10 +110,6 @@ class Chart:
                 max_x = self.x[i]
 
         return max_x, max_y
-
-    # def allpeaks():
-
-    #     s
     
 
 
@@ -143,16 +136,13 @@ class Chart:
 
 
     def gaussfit(self):
+        '''Fit of a Gaussian curve ("bell curve") to raw x-y data'''
         meanest = self.x[list(self.y).index(max(self.y))]
         sigest = meanest - min(self.x)
-    #    print('estimates',meanest,sigest)
         popt, pcov = optimize.curve_fit(funcgauss,self.x,self.y,p0 = [min(self.y),max(self.y),meanest,sigest])
         print('\n-Gaussian fit results-')
-    #    print('amplitude {}\nmean {}\nsigma {}'.format(*popt))
         print('y-shift {}\namplitude {}\nmean {}\nsigma {}'.format(*popt))
-
         print('covariance matrix \n{}'.format(pcov))
-    #    print('pcov',pcov)
         return popt
         
     def SchPeak(self,show=True,xrange=[12,13]):
@@ -169,11 +159,15 @@ class Chart:
         
         y0,a,mean,sigma = Chart(xseg,yseg).gaussfit()
         ysegfit = funcgauss(np.array(xseg),y0,a,mean,sigma)
-        
+
         'FULL WIDTH AT HALF MAXIMUM'
         FWHM_deg = sigma*2*np.sqrt(2*np.log(2))
         FWHM = FWHM_deg*np.pi/180
         print('\nFWHM == sigma*2*sqrt(2*ln(2)): {} degrees'.format(FWHM_deg))
+
+        HWMIN = sigma*np.sqrt(2*np.log((50)))
+        print('\nHalf-width Minimum (HWMIN) (1/50 max) == sigma*sqrt(2*ln(50)): {} degrees'.\
+            format(HWMIN))
 
         'scherrer width peak calculations'
         max_twotheta = xseg[list(yseg).index(max(yseg))]
@@ -190,9 +184,49 @@ class Chart:
         print('\nSCHERRER WIDTH: {} nm'.format(Sch))
         
         if show:
-            plt.plot(xseg,yseg,color='m')
+            plt.plot(X,Y,'c--')             # gauss fit 
+            plt.plot(xseg,yseg,color='m')   # fitted segment
 
-        return Sch,X,Y
+        left = mean - HWMIN
+        right = mean + HWMIN 
+
+        # return Sch,X,Y
+        return max_twotheta, Sch, left,right
+
+    def allpeaks_recur(self,show = True, left=0, right=1, tol=0.2,schpeaks=[]):
+
+        maxx, maxy = Chart(self.x, self.y).local_max(xrange=[left,right])
+
+        Sch_x, Sch, l,r = Chart(self.x, self.y).SchPeak(show=show,xrange=[maxx-0.5,maxx+0.5])
+
+        # self.schpeaks.append(Sch)
+        schpeaks.append([Sch_x,Sch])
+        peak_max = maxy
+
+        if peak_max > tol*max(self.y):
+            Chart(self.x, self.y).allpeaks_recur(True, r, right,tol,schpeaks)
+            Chart(self.x, self.y).allpeaks_recur(True, left, l,tol,schpeaks)
+
+
+    def allpeaks(self, tol=0.2, show = True):
+        '''Driver code for allpeaks recursion. This is what must be called'''
+
+        #init xrange [left, right]
+        left = min(self.x)
+        right = max(self.x)
+        schpeaks_ = []
+
+        Chart(self.x, self.y).allpeaks_recur(True, left, right, tol, schpeaks_)
+
+
+        print('\nallpeaks : Automated Scherrer width calculation of all peaks'+\
+             ' [within a certain tolerance]\nSUMMARY:')
+
+        sortidcs = np.argsort(np.array(schpeaks_).T[0])
+        # print(sortidcs)
+        for i in sortidcs:
+            print('2-theta: {} deg - Sch width: {} nm'.format(*schpeaks_[i]))
+    
 
 
     def mav(self,n=1,show=False):

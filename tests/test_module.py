@@ -35,6 +35,17 @@ def test_sch():
     plt.show()
 
 
+def test_allpeaks():
+    
+    data = xrd.Data('sample1.xy').importfile()
+    chart = xrd.Chart(*data)
+
+    chart.backsub(tol=1.0,show=True)
+    chart.allpeaks(tol=0.2,show=True)
+    plt.xlabel('2 $\\theta$')
+    plt.suptitle('backsub & Automated Scherrer width calculation of all peaks*')
+    plt.show()
+
 
 def test_mav():
     
@@ -51,5 +62,6 @@ def test_mav():
 test_isofncs()
 test_backsub()
 test_sch()
+test_allpeaks()
 test_mav()
 
