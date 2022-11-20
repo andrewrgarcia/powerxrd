@@ -233,7 +233,7 @@ class Chart:
             Chart(self.x, self.y).allpeaks_recur(True, left, l,tol,schpeaks)
 
 
-    def allpeaks(self, tol=0.5, show = True):
+    def allpeaks(self, tol=0.2, show = True):
         '''Driver code for allpeaks recursion : Automated Scherrer width calculation of all peaks
         
         Parameters
