@@ -43,7 +43,7 @@ def braggs_s(twotheta,lmda=1.54):
 
 def scherrer(K,lmda,beta,theta):
     '''Scherrer equation'''
-    print('Scherrer Width == K*lmda / (FWHM*cos(theta))')
+    # print('Scherrer Width == K*lmda / (FWHM*cos(theta))')
     return K*lmda / (beta*np.cos(theta))    #tau
 
 
@@ -148,18 +148,20 @@ class Chart:
             return twothet_Ki_deg
 
 
-    def gaussfit(self):
+    def gaussfit(self, verbose=True):
         '''Fit of a Gaussian curve ("bell curve") to raw x-y data'''
         meanest = self.x[list(self.y).index(max(self.y))]
         sigest = meanest - min(self.x)
         popt, pcov = optimize.curve_fit(funcgauss,self.x,self.y,p0 = [min(self.y),max(self.y),meanest,sigest])
-        print('\n-Gaussian fit results-')
-        print('y-shift {}\namplitude {}\nmean {}\nsigma {}'.format(*popt))
-        print('covariance matrix \n{}'.format(pcov))
+        
+        if verbose:
+            print('\n-Gaussian fit results-')
+            print('y-shift {}\namplitude {}\nmean {}\nsigma {}'.format(*popt))
+            print('covariance matrix \n{}'.format(pcov))
         return popt
 
         
-    def SchPeak(self,xrange=[12,13],show=True):
+    def SchPeak(self,xrange=[12,13],verbose=True, show=True):
         '''Scherrer width calculation for peak within a specified range
         
         Parameters
@@ -170,7 +172,7 @@ class Chart:
             show plot of XRD chart
         '''
 
-        print('\nSchPeak: Scherrer width calc. for peak in range of [{},{}]'.format(*xrange))
+        # print('\nSchPeak: Scherrer width calc. for peak in range of [{},{}]'.format(*xrange))
 
         'xseg and yseg:x and y segments of data in selected xrange'
         xseg,yseg = [],[]
@@ -180,17 +182,17 @@ class Chart:
                 yseg.append(j) 
 
         
-        y0,a,mean,sigma = Chart(xseg,yseg).gaussfit()
+        y0,a,mean,sigma = Chart(xseg,yseg).gaussfit(verbose)
         ysegfit = funcgauss(np.array(xseg),y0,a,mean,sigma)
 
         'FULL WIDTH AT HALF MAXIMUM'
         FWHM_deg = sigma*2*np.sqrt(2*np.log(2))
         FWHM = FWHM_deg*np.pi/180
-        print('\nFWHM == sigma*2*sqrt(2*ln(2)): {} degrees'.format(FWHM_deg))
+        # print('\nFWHM == sigma*2*sqrt(2*ln(2)): {} degrees'.format(FWHM_deg))
 
         HWMIN = sigma*np.sqrt(2*np.log((50)))
-        print('\nHalf-width Minimum (HWMIN) (1/50 max) == sigma*sqrt(2*ln(50)): {} degrees'.\
-            format(HWMIN))
+        # print('\nHalf-width Minimum (HWMIN) (1/50 max) == sigma*sqrt(2*ln(50)): {} degrees'.\
+        #     format(HWMIN))
 
         'scherrer width peak calculations'
         max_x = xseg[list(yseg).index(max(yseg))]
@@ -198,13 +200,24 @@ class Chart:
         theta=max_x/2
         theta=theta*np.pi/180
 
-        print('K (shape factor): {}\nK-alpha: {} nm \nmax 2-theta: {} degrees'.\
-            format(self.K,self.lambdaKa,max_x))
+        # print('K (shape factor): {}\nK-alpha: {} nm \nmax 2-theta: {} degrees'.\
+        #     format(self.K,self.lambdaKa,max_x))
         
         Sch=scherrer(self.K,self.lambdaKa,FWHM,theta)
         X,Y = xseg,ysegfit
 
-        print('\nSCHERRER WIDTH: {} nm'.format(Sch))
+        # print('\nSCHERRER WIDTH: {} nm'.format(Sch))
+
+        if verbose:
+            print('\nSchPeak: Scherrer width calc. for peak in range of [{},{}]'.\
+                                    format(*xrange))
+            print('\nFWHM == sigma*2*sqrt(2*ln(2)): {} degrees'.\
+                                    format(FWHM_deg))
+            print('K (shape factor): {}\nK-alpha: {} nm \nmax 2-theta: {} degrees'.\
+                                    format(self.K,self.lambdaKa,max_x))
+            print('\nSCHERRER WIDTH: {} nm'.\
+                                    format(Sch))
+
         
         if show:
             plt.plot(X,Y,'c--')             # gauss fit 
@@ -216,25 +229,27 @@ class Chart:
         # return Sch,X,Y
         return max_x, max(yseg), Sch, left,right
 
-    def allpeaks_recur(self,left=0, right=1, tols=(0.2,0.8),schpeaks=[],show = True):
+    def allpeaks_recur(self,left=0, right=1, tols=(0.2,0.8),schpeaks=[],verbose = False, show = True):
         '''recursion component function for main allpeaks function below'''
-        print('left right',left,right)
-        maxx, maxy = Chart(self.x, self.y).local_max(xrange=[left,right])
+        # print('left right',left,right)
+        max_x, max_y = Chart(self.x, self.y).local_max(xrange=[left,right])
 
         tol_h, dist_top = tols        
 
-        Sch_x, Sch_y, Sch, l,r = Chart(self.x, self.y).SchPeak(xrange=[maxx-dist_top,maxx+dist_top],show=show)
+        xrange = [max_x-dist_top, max_x+dist_top]
+        Sch_x, Sch_y, Sch, l,r = Chart(self.x, self.y).\
+                        SchPeak(xrange,verbose,show)
 
         # self.schpeaks.append(Sch)
         schpeaks.append([Sch_x,Sch_y,Sch])
-        peak_max = maxy
+        peak_max = max_y
 
         if peak_max > tol_h*max(self.y):
-            Chart(self.x, self.y).allpeaks_recur(r, right,tols,schpeaks,True)
-            Chart(self.x, self.y).allpeaks_recur(left, l,tols,schpeaks,True)
+            Chart(self.x, self.y).allpeaks_recur(r, right,tols,schpeaks,verbose,show)
+            Chart(self.x, self.y).allpeaks_recur(left, l,tols,schpeaks,verbose,show)
 
 
-    def allpeaks(self, tols=(0.2,0.8), show = True):
+    def allpeaks(self, tols=(0.2,0.8), verbose=False, show = True):
         '''Driver code for allpeaks recursion : Automated Scherrer width calculation of all peaks
         
         Parameters
@@ -246,17 +261,18 @@ class Chart:
         show: bool
             show plot of XRD chart
         '''
+        print('\n-------------------------------------------\nALLPEAKS: '+\
+            'Automated Scherrer width calculations with a recursive search of local maxima\n')
 
         #init xrange [left, right]
         left = min(self.x)
         right = max(self.x)
         schpeaks_ = []
 
-        Chart(self.x, self.y).allpeaks_recur(left, right, tols, schpeaks_, True)
+        Chart(self.x, self.y).allpeaks_recur(left, right, tols, schpeaks_,verbose,show)
 
 
-        print('\nallpeaks : Automated Scherrer width calculation of all peaks'+\
-             ' [within a certain tolerance]\nSUMMARY:')
+        print('\nSUMMARY:')
         print('2-theta / deg, \t Intensity, \t Sch width / nm')
 
         # for i in schpeaks_:

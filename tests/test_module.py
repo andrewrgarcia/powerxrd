@@ -28,7 +28,7 @@ def test_sch():
     chart = xrd.Chart(*data)
 
     chart.backsub(tol=1.0,show=True)
-    chart.SchPeak(xrange=[18,22],show=True)
+    chart.SchPeak(xrange=[18,22],verbose=True, show=True)
     plt.xlabel('2 $\\theta$')
     plt.title('backsub and Scherrer width calculation')
     plt.show()
@@ -40,7 +40,7 @@ def test_allpeaks():
     chart = xrd.Chart(*data)
 
     chart.backsub(tol=1.0,show=True)
-    chart.allpeaks(tols=(0.2,0.8),show=True)
+    chart.allpeaks(tols=(0.2,0.8),verbose=False, show=True)
     plt.xlabel('2 $\\theta$')
     plt.suptitle('backsub & Automated Scherrer width calculation of all peaks*')
     plt.show()
