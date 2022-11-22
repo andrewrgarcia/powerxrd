@@ -1,11 +1,21 @@
 # powerxrd
 Simple tools to handle powder XRD (and XRD) data
 
+
+
+
 ## Installation
 
 ```bash
 pip install powerxrd
 ```
+
+## Just starting? Learn how to use powerxrd by running the Colab notebook (click on below icon)
+
+<a href="https://colab.research.google.com/drive/1_Eq-cW6LSPPnaRjkbeHaC81Wfbd8mQS-?usp=sharing">
+<img src="https://github.com/andrewrgarcia/powerxrd/blob/main/img/colab.png?raw=true" width="500" ></a>
+
+
 ## Usage
 On your Terminal ("command line"), copy-paste the following lines:
 ```python 
