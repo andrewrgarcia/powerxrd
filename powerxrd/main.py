@@ -63,9 +63,13 @@ class Data:
         self.file = file
 
     
-    def importfile(self):
+    def importfile(self,format='xy'):
 
-        df = pandas.read_csv(self.file, sep='\t', header=None)   #'https://www.statology.org/pandas-read-text-file/'
+        if format=='xy':
+            df = pandas.read_csv(self.file, sep='\t', header=None)   #'https://www.statology.org/pandas-read-text-file/'
+        else:
+            df = pandas.read_csv(self.file, header=None)   
+
         x,y = np.array(df).T
 
         return x,y
