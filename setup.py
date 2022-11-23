@@ -16,7 +16,7 @@ with open(path.join(HERE, 'README.md'), encoding='utf-8') as f:
 # This call to setup() does all the work
 setup(
     name="powerxrd",
-    version="2.1.4",
+    version="2.1.5",
     description="Simple tools to handle powder XRD (and XRD) data with Python.",
     long_description=long_description,
     long_description_content_type="text/markdown",
