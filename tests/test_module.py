@@ -27,7 +27,7 @@ def test_backsub_multiplt():
     # xrd.Data can now also import csv file with .importfile('csv') option 
     for j in range(2):
         for i in range(1,5):
-            data = xrd.Data('synthetic-data/sample{}.csv'.format(i+j-1)).importfile('csv')
+            data = xrd.Data('synthetic-data/sample{}.csv'.format(i+j-1)).importfile()
             chart = xrd.Chart(*data)
             axs[i+1].plot(*chart.backsub(),color='C'+str(i+j-1),label='sample{}.csv'.format(i+j-1))
             axs[i+1].legend()
@@ -54,11 +54,11 @@ def test_backsub_emission():
 
 def test_sch():
     
-    data = xrd.Data('synthetic-data/sample1.xy').importfile()
+    data = xrd.Data('synthetic-data/sample3.csv').importfile()
     chart = xrd.Chart(*data)
 
     chart.backsub(tol=1.0,show=True)
-    chart.SchPeak(xrange=[18,22],verbose=True, show=True)
+    chart.SchPeak(xrange=[56,58],verbose=True, show=True)
     plt.xlabel('2 $\\theta$')
     plt.title('backsub and Scherrer width calculation')
     plt.show()

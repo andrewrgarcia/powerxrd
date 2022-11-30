@@ -63,16 +63,17 @@ class Data:
         self.file = file
 
     
-    def importfile(self,format='xy'):
+    def importfile(self):
 
-        if format=='xy':
+        if self.file.split(".")[1]=='xy':
             df = pandas.read_csv(self.file, sep='\t', header=None)   #'https://www.statology.org/pandas-read-text-file/'
-        else:
+
+        if self.file.split(".")[1]=='csv':
             df = pandas.read_csv(self.file, header=None)   
 
-        x,y = np.array(df).T
 
-        return x,y
+        x,y = np.array(df).T
+        return x,y 
 
 class Chart:
 
