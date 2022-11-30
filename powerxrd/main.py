@@ -233,24 +233,21 @@ class Chart:
         # return Sch,X,Y
         return max_x, max(yseg), Sch, left,right
 
-    def allpeaks_recur(self,left=0, right=1, tols=(0.2,0.8),schpeaks=[],verbose = False, show = True):
+    def allpeaks_recur(self,left=0, right=1, tols_=(2e5,0.8),schpeaks=[],verbose = False, show = True):
         '''recursion component function for main allpeaks function below'''
         # print('left right',left,right)
         max_x, max_y = Chart(self.x, self.y).local_max(xrange=[left,right])
+        maxpeak_height, peaktrough_d = tols_ 
+        peak_max = max_y     
 
-        tol_h, dist_top = tols        
-
-        xrange = [max_x-dist_top, max_x+dist_top]
-        Sch_x, Sch_y, Sch, l,r = Chart(self.x, self.y).\
+        if peak_max > maxpeak_height:
+            xrange = [ max_x - peaktrough_d, max_x + peaktrough_d ]
+            Sch_x, Sch_y, Sch, l,r = Chart(self.x, self.y).\
                         SchPeak(xrange,verbose,show)
+            schpeaks.append([Sch_x,Sch_y,Sch])
 
-        # self.schpeaks.append(Sch)
-        schpeaks.append([Sch_x,Sch_y,Sch])
-        peak_max = max_y
-
-        if peak_max > tol_h*max(self.y):
-            Chart(self.x, self.y).allpeaks_recur(r, right,tols,schpeaks,verbose,show)
-            Chart(self.x, self.y).allpeaks_recur(left, l,tols,schpeaks,verbose,show)
+            Chart(self.x, self.y).allpeaks_recur(left, l,tols_,schpeaks,verbose,show)
+            Chart(self.x, self.y).allpeaks_recur(r, right,tols_,schpeaks,verbose,show)
 
 
     def allpeaks(self, tols=(0.2,0.8), verbose=False, show = True):
@@ -260,8 +257,8 @@ class Chart:
         ----------
         tols : (float, float)
             tolerances for recursion 
-            tol[0]: Minimum peak height to be calculated as a percent of maximum peak in chart (default=0.2 [20% of global maximum])
-            tol[1]: Distance from top of peak to its tail (default=0.8)
+            tol[0]: Minimum peak height to be calculated as a percent of the chart's global maximum (default=0.2 [20% of global maximum])
+            tol[1]: Average distance from peak (top) to trough (bottom) of all peak (default=0.8)
         show: bool
             show plot of XRD chart
         '''
@@ -273,10 +270,16 @@ class Chart:
         right = max(self.x)
         schpeaks_ = []
 
-        Chart(self.x, self.y).allpeaks_recur(left, right, tols, schpeaks_,verbose,show)
+        max_x, max_y = Chart(self.x, self.y).local_max(xrange=[left,right])
+        print('\n')
+        maxpeak_height = max_y*tols[0]
+        peaktrough_d = tols[1]
+
+        tols_ = (maxpeak_height, peaktrough_d)
+        Chart(self.x, self.y).allpeaks_recur(left, right, tols_, schpeaks_,verbose,show)
 
 
-        print('\nSUMMARY:')
+        print('\nSUMMARY (.csv format):')
         print('2-theta / deg, \t Intensity, \t Sch width / nm')
 
         # for i in schpeaks_:

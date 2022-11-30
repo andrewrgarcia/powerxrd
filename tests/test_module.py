@@ -70,11 +70,21 @@ def test_allpeaks():
     chart = xrd.Chart(*data)
 
     chart.backsub(tol=1.0,show=True)
-    chart.allpeaks(tols=(0.2,0.8),verbose=False, show=True)
+    chart.allpeaks(tols=(0.1,0.8),verbose=False, show=True)
     plt.xlabel('2 $\\theta$')
     plt.suptitle('backsub & Automated Scherrer width calculation of all peaks*')
     plt.show()
 
+
+from scipy.signal import find_peaks
+def test_scipypeaks():
+    data = xrd.Data('synthetic-data/sample1.xy').importfile()
+    chart = xrd.Chart(*data)
+    x,y = chart.backsub()
+    peaks, _ = find_peaks(y, height=0.1*max(y))
+    plt.plot(x,y)
+    plt.plot(x[peaks], y[peaks], "x")
+    plt.show()
 
 def test_mav():
     
@@ -93,5 +103,6 @@ test_backsub_multiplt()
 test_backsub_emission()
 test_sch()
 test_allpeaks()
+test_scipypeaks()
 test_mav()
 
