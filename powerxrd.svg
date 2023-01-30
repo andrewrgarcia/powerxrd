@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="195.416mm"
+   height="195.41644mm"
+   viewBox="0 0 195.416 195.41644"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (1:1.2.2+202212051552+b0a8486541)"
+   sodipodi:docname="powerxrd.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.43651796"
+     inkscape:cx="293.22963"
+     inkscape:cy="301.24763"
+     inkscape:window-width="1206"
+     inkscape:window-height="656"
+     inkscape:window-x="74"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <rect
+       x="222.49858"
+       y="507.5144"
+       width="284.07596"
+       height="267.02496"
+       id="rect1161" />
+    <rect
+       x="-152.28645"
+       y="33.517269"
+       width="257.53622"
+       height="700.9071"
+       id="rect1155" />
+    <rect
+       x="305.3949"
+       y="234.26294"
+       width="152.64188"
+       height="314.63818"
+       id="rect504" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-5.6289433,-17.474469)">
+    <path
+       style="fill:#ff6600;fill-opacity:1;stroke:#17ff95;stroke-width:1.1;stroke-opacity:0"
+       d="m 22.203474,178.75017 21.326122,-123.7944 18.91765,124.51848 75.807034,-0.46389 20.79735,-124.790073 25.3984,123.969023 z"
+       id="path446" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:86.0538px;font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;fill-opacity:1;stroke:#17ff95;stroke-width:1.86337;stroke-opacity:0"
+       x="74.400887"
+       y="139.30411"
+       id="text510"
+       transform="scale(0.98355961,1.0167152)"><tspan
+         sodipodi:role="line"
+         id="tspan508"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:86.0538px;font-family:'Arial Black';-inkscape-font-specification:'Arial Black, ';fill:#000000;fill-opacity:1;stroke:#17ff95;stroke-width:1.86337;stroke-opacity:0"
+         x="74.400887"
+         y="139.30411">P</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,-0.55000001,18.024467)"
+       id="text1153"
+       style="font-size:192px;white-space:pre;shape-inside:url(#rect1155);fill:#000000;fill-opacity:1;stroke:#17ff95;stroke-width:4.15748;stroke-opacity:0" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,-0.55000001,18.024467)"
+       id="text1159"
+       style="font-size:192px;white-space:pre;shape-inside:url(#rect1161);fill:#000000;fill-opacity:1;stroke:#17ff95;stroke-width:4.15748;stroke-opacity:0" />
+  </g>
+</svg>
