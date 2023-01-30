@@ -1,6 +1,8 @@
 # powerxrd
 Simple tools to handle powder XRD (and XRD) data
 
+<img src="https://raw.githubusercontent.com/andrewrgarcia/powerxrd/main/powerxrd.svg" width="400">
+
 
 ## Installation
 
