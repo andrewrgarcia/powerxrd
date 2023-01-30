@@ -98,11 +98,11 @@ def test_mav():
     plt.title('backsub and {}-point moving average'.format(n))
     plt.show()
 
-test_isofncs()
-test_backsub_multiplt()
-test_backsub_emission()
-test_sch()
-test_allpeaks()
-test_scipypeaks()
-test_mav()
+# test_isofncs()
+# test_backsub_multiplt()
+# test_backsub_emission()
+# test_sch()
+# test_allpeaks()
+# test_scipypeaks()
+# test_mav()
 

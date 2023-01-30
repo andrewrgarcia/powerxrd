@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "powerxrd"
+version = "2.1.8"
+description = "Simple tools to handle powder XRD (and XRD) data with Python."
+authors = ["andrewrgarcia <garcia.gtr@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.12"
+pandas = "^1.5.3"
+scipy = "^1.10.0"
+numpy = "^1.24.1"
+matplotlib = "^3.6.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
