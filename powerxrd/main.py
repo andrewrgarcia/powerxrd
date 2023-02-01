@@ -235,16 +235,34 @@ class Chart:
         return max_x, max(yseg), Sch, left,right
 
 
-    def Rietveld(self,xrange=[12,13],verbose=True, show=True):
-        '''Scherrer width calculation for peak within a specified range
+    def Rietveld(self,verbose=True, show=True):
+        '''
+        
         
         Parameters
         ----------
-        xrange : [](float)
-            range of x-axis (2-theta) where peak to be calculated is found
-        show: bool
-            show plot of XRD chart
+
         '''
+
+        s = 'scale factor'
+        m_K = 'multiplicity factor'
+        L_pK = 'Lorentz-Polarization factor'
+        F_K = 'Structure Factor'
+        phi = 'Reflection Profile function'
+        Theta_k = '2\theta_k: the calculated position of the Bragg peak corrected for the zero-point shift of the counter (Rietveld 1969)'
+        P_K = 'Preferred orientation'
+        A = 'Absorption Factor'
+        y_bi = 'Background'
+
+        K = []  # Miller indices (hkl)
+
+
+        y_cal = 0
+        for i in K:
+            Theta_i = self.x        # or variation thereof
+            y_cal+= m_K * L_pK * np.abs(F_K)**2 * phi * (Theta_i - Theta_k) * P_K * A + y_bi
+            
+        y_cal*=s
 
 
     def allpeaks_recur(self,left=0, right=1, tols_=(2e5,0.8),schpeaks=[],verbose = False, show = True):
