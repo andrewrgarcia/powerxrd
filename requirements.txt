@@ -1,5 +1,0 @@
-matplotlib==3.2.2
-numpy==1.22.4
-pandas==1.4.3
-scipy==1.5.0
-setuptools==65.3.0

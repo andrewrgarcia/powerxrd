@@ -234,6 +234,19 @@ class Chart:
         # return Sch,X,Y
         return max_x, max(yseg), Sch, left,right
 
+
+    def Rietveld(self,xrange=[12,13],verbose=True, show=True):
+        '''Scherrer width calculation for peak within a specified range
+        
+        Parameters
+        ----------
+        xrange : [](float)
+            range of x-axis (2-theta) where peak to be calculated is found
+        show: bool
+            show plot of XRD chart
+        '''
+
+
     def allpeaks_recur(self,left=0, right=1, tols_=(2e5,0.8),schpeaks=[],verbose = False, show = True):
         '''recursion component function for main allpeaks function below'''
         # print('left right',left,right)
