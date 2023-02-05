@@ -75,6 +75,58 @@ class Data:
         x,y = np.array(df).T
         return x,y 
 
+class Rietveld:
+    def __init__(self,x,y):
+        '''Chart structure. Constructs x-y XRD data to manipulate and analyze. 
+
+        Parameters
+        ----------
+        x : np.array(float)
+            array with x-data 2-theta values
+        y : np.array(float)
+            array with y-data peak intensity values
+        K : float
+            dimensionless shape factor for Scherrer equation (default 0.9)
+        lambdaKa : float
+            X-ray wavelength of \alpha radiation
+        lambdaKi : float
+            X-ray wavelength of "i" radiation (\beta, \gamma, other)
+        '''
+        self.x          = x          # x values
+        self.y          = y          # y values
+        
+
+        self.s = 'scale factor'
+        self.m_K = 'multiplicity factor'
+        self.L_pK = 'Lorentz-Polarization factor'
+        self.phi = 'Reflection Profile function'
+        self.Theta_k = '2\theta_k: the calculated position of the Bragg peak corrected for the zero-point shift of the counter (Rietveld 1969)'
+        self.P_K = 'Preferred orientation'
+        self.A = 'Absorption Factor'
+        self.y_bi = 'Background'
+
+        K = []  # Miller indices (hkl)
+
+        imag_i = 1j
+
+        hkl = [1,1,1]
+
+        self.N_j = 'Nj is the site occupancy divided by the site multiplicity'
+        self.f_j = 'fj is the atomic form factor'
+        x_j,y_j,z_j = 1,1,1     # xj , yj and zj are the atomic positions 
+        self.M_j = 'M j contains the thermal contributions (atomic displacements)'
+
+        'Structure Factor'
+        F_K = self.N_j * self.f_j * np.exp ( 2 * np.pi * imag_i ) * np.dot(hkl,[x_j,y_j,z_j]) * np.exp(1) - self.M_j 
+
+
+        y_cal = 0
+        for i in K:
+            Theta_i = self.x        # or variation thereof
+            y_cal+= self.m_K * self.L_pK * np.abs(self.F_K)**2 * self.phi * (Theta_i - self.Theta_k) * self.P_K * self.A + self.y_bi
+            
+        y_cal*=self.s
+
 class Chart:
 
     def __init__(self,x,y):
@@ -235,45 +287,7 @@ class Chart:
         return max_x, max(yseg), Sch, left,right
 
 
-    def Rietveld(self,verbose=True, show=True):
-        '''
-        
-        
-        Parameters
-        ----------
 
-        '''
-
-        s = 'scale factor'
-        m_K = 'multiplicity factor'
-        L_pK = 'Lorentz-Polarization factor'
-        phi = 'Reflection Profile function'
-        Theta_k = '2\theta_k: the calculated position of the Bragg peak corrected for the zero-point shift of the counter (Rietveld 1969)'
-        P_K = 'Preferred orientation'
-        A = 'Absorption Factor'
-        y_bi = 'Background'
-
-        K = []  # Miller indices (hkl)
-
-        imag_i = 1j
-
-        hkl = [1,1,1]
-
-        N_j = 'Nj is the site occupancy divided by the site multiplicity'
-        f_j = 'fj is the atomic form factor'
-        x_j,y_j,z_j = 1,1,1     # xj , yj and zj are the atomic positions 
-        M_j = 'M j contains the thermal contributions (atomic displacements)'
-
-        'Structure Factor'
-        F_K = N_j * f_j * np.exp ( 2 * np.pi * imag_i ) * np.dot(hkl,[x_j,y_j,z_j]) * np.exp(1) - M_j 
-
-
-        y_cal = 0
-        for i in K:
-            Theta_i = self.x        # or variation thereof
-            y_cal+= m_K * L_pK * np.abs(F_K)**2 * phi * (Theta_i - Theta_k) * P_K * A + y_bi
-            
-        y_cal*=s
 
 
     def allpeaks_recur(self,left=0, right=1, tols_=(2e5,0.8),schpeaks=[],verbose = False, show = True):
