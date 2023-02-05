@@ -1,4 +1,21 @@
-## Rietveld refinement
+# Rietvelt refinement reference
+
+## FullProf how to
+
+[https://www.youtube.com/watch?v=GI3N3HVN3xc](https://www.youtube.com/watch?v=GI3N3HVN3xc)
+
+3 files
+	CIF file - reference model
+	XRD file - collected in very slow scan rate
+	IRF file - (optional)
+	
+## structure factor
+
+[https://www.researchgate.net/post/How-can-I-estimate-the-uncertainty-in-structure-factors-derived-from-X-ray-diffraction-experiments](https://www.researchgate.net/post/How-can-I-estimate-the-uncertainty-in-structure-factors-derived-from-X-ray-diffraction-experiments)
+
+
+
+## articles
 
 Rietveld, H.M. (1969), A profile refinement method for nuclear and magnetic structures. J. Appl. Cryst., 2: 65-71. [https://doi.org/10.1107/S0021889869006558](https://doi.org/10.1107/S0021889869006558)
 
@@ -22,4 +39,3 @@ Diffraction Line Profiles in the Rietveld Method
 Paolo Scardi
 Crystal Growth & Design 2020 20 (10), 6903-6916
 [DOI: 10.1021/acs.cgd.0c00956 ](https://pubs.acs.org/doi/10.1021/acs.cgd.0c00956)
-

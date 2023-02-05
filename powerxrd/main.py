@@ -247,7 +247,6 @@ class Chart:
         s = 'scale factor'
         m_K = 'multiplicity factor'
         L_pK = 'Lorentz-Polarization factor'
-        F_K = 'Structure Factor'
         phi = 'Reflection Profile function'
         Theta_k = '2\theta_k: the calculated position of the Bragg peak corrected for the zero-point shift of the counter (Rietveld 1969)'
         P_K = 'Preferred orientation'
@@ -255,6 +254,18 @@ class Chart:
         y_bi = 'Background'
 
         K = []  # Miller indices (hkl)
+
+        imag_i = 1j
+
+        hkl = [1,1,1]
+
+        N_j = 'Nj is the site occupancy divided by the site multiplicity'
+        f_j = 'fj is the atomic form factor'
+        x_j,y_j,z_j = 1,1,1     # xj , yj and zj are the atomic positions 
+        M_j = 'M j contains the thermal contributions (atomic displacements)'
+
+        'Structure Factor'
+        F_K = N_j * f_j * np.exp ( 2 * np.pi * imag_i ) * np.dot(hkl,[x_j,y_j,z_j]) * np.exp(1) - M_j 
 
 
         y_cal = 0
