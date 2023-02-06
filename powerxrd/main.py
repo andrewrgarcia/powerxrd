@@ -77,7 +77,7 @@ class Data:
 
 class Rietveld:
     def __init__(self,x,y):
-        '''Chart structure. Constructs x-y XRD data to manipulate and analyze. 
+        '''Rietveld class. 
 
         Parameters
         ----------
@@ -85,45 +85,54 @@ class Rietveld:
             array with x-data 2-theta values
         y : np.array(float)
             array with y-data peak intensity values
-        K : float
-            dimensionless shape factor for Scherrer equation (default 0.9)
-        lambdaKa : float
-            X-ray wavelength of \alpha radiation
-        lambdaKi : float
-            X-ray wavelength of "i" radiation (\beta, \gamma, other)
         '''
         self.x          = x          # x values
         self.y          = y          # y values
         
 
-        self.s = 'scale factor'
-        self.m_K = 'multiplicity factor'
-        self.L_pK = 'Lorentz-Polarization factor'
-        self.phi = 'Reflection Profile function'
-        self.Theta_k = '2\theta_k: the calculated position of the Bragg peak corrected for the zero-point shift of the counter (Rietveld 1969)'
-        self.P_K = 'Preferred orientation'
-        self.A = 'Absorption Factor'
+        self.s = 1      # 'scale factor' (const)
+        self.m_K = 2    # 'multiplicity factor' (const - depends on lattice symmetry)
+        
+        'Lorentz-Polarization factor (this is complex)'
+        # CTHM = coefficient for monochromator polarization 
+        # TwoTheta_M : The Bragg angle of the reflection from a monochromator (it is a constant for a fixed wavelength)
+        TwoTheta_M = 1
+
+        CTHM = np.cos(TwoTheta_M)**2
+        L_pK = ( 1 - K +  (K*CTHM*np.cos(2*Theta)**2) ) \
+                    / ( ( 2 * (np.sin(Theta))**2 ) * np.cos(Theta) )  
+         
+
+        'Reflection Profile function (string-> conditional)'
+        self.phi = 'pseudo-voight; voight, gauss, etc'
+
+        '2\theta_k: the calculated position of the Bragg peak corrected for the zero-point shift of the counter (Rietveld 1969)'
+        Theta_k = 1         # to fit
+
+        'Preferred orientation i.e. it is a multiplier, which accounts for possible deviations from a complete randomness in the distribution of grain orientations (Pecharsky 2005)'
+        self.P_K = 1        # to fit?4
+
+        
+        self.A = 'Absorption Factor (formula)'
         self.y_bi = 'Background'
 
-        K = []  # Miller indices (hkl)
-
         imag_i = 1j
-
-        hkl = [1,1,1]
 
         self.N_j = 'Nj is the site occupancy divided by the site multiplicity'
         self.f_j = 'fj is the atomic form factor'
         x_j,y_j,z_j = 1,1,1     # xj , yj and zj are the atomic positions 
         self.M_j = 'M j contains the thermal contributions (atomic displacements)'
 
+        # Miller indices (hkl)
+        hkl = [1,1,1]
+        
         'Structure Factor'
         F_K = self.N_j * self.f_j * np.exp ( 2 * np.pi * imag_i ) * np.dot(hkl,[x_j,y_j,z_j]) * np.exp(1) - self.M_j 
 
-
         y_cal = 0
-        for i in K:
+        for i in range(len(hkl)):
             Theta_i = self.x        # or variation thereof
-            y_cal+= self.m_K * self.L_pK * np.abs(self.F_K)**2 * self.phi * (Theta_i - self.Theta_k) * self.P_K * self.A + self.y_bi
+            y_cal+= self.m_K * L_pK * np.abs(self.F_K)**2 * self.phi * (Theta_i - self.Theta_k) * self.P_K * self.A + self.y_bi
             
         y_cal*=self.s
 

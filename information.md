@@ -24,6 +24,9 @@ Refinement of X-ray and/or Neutron Data (powder and/or single-crystal)[[  link  
 
 Flores-Cano, D. A., Chino-Quispe, A. R., Rueda Vellasmin, R., Ocampo-Anticona, J. A., González, J. C., & Ramos-Guivar, J. A. (2021). Fifty years of Rietveld refinement: Methodology and guidelines in superconductors and functional magnetic nanoadsorbents. Revista De Investigación De Física, 24(3), 39–48. [https://doi.org/10.15381/rif.v24i3.21028](https://doi.org/10.15381/rif.v24i3.21028)
 
+Vitalij K. Pecharsky , Peter Y. Zavalij. Fundamentals of Powder Diffraction and Structural Characterization of Materials, Second Edition - Textbook (c) 2009 [[  link ]](https://link.springer.com/book/10.1007/978-0-387-09579-0)  
+  
+
 Rietveld Refinement for Macromolecular Powder Diffraction
 Maria Spiliopoulou, Dimitris-Panagiotis Triandafillidis, Alexandros Valmas, Christos Kosinas, Andrew N. Fitch, Robert B. Von Dreele, and Irene Margiolaki
 Crystal Growth & Design 2020 20 (12), 8101-8123
