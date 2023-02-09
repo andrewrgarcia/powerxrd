@@ -75,67 +75,77 @@ class Data:
         x,y = np.array(df).T
         return x,y 
 
-class Rietveld:
-    def __init__(self,x,y):
-        '''Rietveld class. 
 
+def Rietveld(x,s,m_K,K,TwoTheta_M ):
+
+        '''Rietveld equation
         Parameters
         ----------
         x : np.array(float)
             array with x-data 2-theta values
-        y : np.array(float)
-            array with y-data peak intensity values
-        '''
-        self.x          = x          # x values
-        self.y          = y          # y values
-        
-
         self.s = 1      # 'scale factor' (const)
         self.m_K = 2    # 'multiplicity factor' (const - depends on lattice symmetry)
-        
-        'Lorentz-Polarization factor (this is complex)'
-        # CTHM = coefficient for monochromator polarization 
-        # TwoTheta_M : The Bragg angle of the reflection from a monochromator (it is a constant for a fixed wavelength)
-        TwoTheta_M = 1
+        .
+        .
+        .
 
-        CTHM = np.cos(TwoTheta_M)**2
-        K=1
-        L_pK = ( 1 - K +  (K*CTHM*np.cos(2*Theta)**2) ) \
-                    / ( ( 2 * (np.sin(Theta))**2 ) * np.cos(Theta) )  
-         
+        '''
+
+        def LorentzPF(Theta,K,TwoTheta_M ):
+            'Lorentz-Polarization factor (this is complex)'
+
+            # CTHM = coefficient for monochromator polarization 
+            # TwoTheta_M : The Bragg angle of the reflection from a monochromator (it is a constant for a fixed wavelength)
+            TwoTheta_M = 1
+
+            CTHM = np.cos(TwoTheta_M)**2
+            K=1
+            L_pK = ( 1 - K +  (K*CTHM*np.cos(2*Theta)**2) ) \
+                        / ( ( 2 * (np.sin(Theta))**2 ) * np.cos(Theta) )  
+
+            return L_pK
 
         'Reflection Profile function (string-> conditional)'
-        self.phi = 'pseudo-voight; voight, gauss, etc'
+        phi = 'pseudo-voight; voight, gauss, etc'
 
         '2\theta_k: the calculated position of the Bragg peak corrected for the zero-point shift of the counter (Rietveld 1969)'
         Theta_k = 1         # to fit
 
         'Preferred orientation i.e. it is a multiplier, which accounts for possible deviations from a complete randomness in the distribution of grain orientations (Pecharsky 2005)'
-        self.P_K = 1        # to fit?4
+        P_K = 1        # to fit?4
 
         
-        self.A = 'Absorption Factor (formula)'
-        self.y_bi = 'Background'
+        A = 'Absorption Factor (formula)'
+        y_bi = 'Background'
 
-        imag_i = 1j
 
-        self.N_j = 'Nj is the site occupancy divided by the site multiplicity'
-        self.f_j = 'fj is the atomic form factor'
-        x_j,y_j,z_j = 1,1,1     # xj , yj and zj are the atomic positions 
-        self.M_j = 'M j contains the thermal contributions (atomic displacements)'
+        # N_j = 'Nj is the site occupancy divided by the site multiplicity'
+        # f_j = 'fj is the atomic form factor'
+        # x_j,y_j,z_j = 1,1,1     # xj , yj and zj are the atomic positions 
+        # M_j = 'M j contains the thermal contributions (atomic displacements)'
 
         # Miller indices (hkl)
         hkl = [1,1,1]
         
-        'Structure Factor'
-        F_K = self.N_j * self.f_j * np.exp ( 2 * np.pi * imag_i ) * np.dot(hkl,[x_j,y_j,z_j]) * np.exp(1) - self.M_j 
+        
+        def Structure_Factor(hkl,x_j,y_j,z_j,N_j,f_j, M_j):
+            'Structure Factor'
+            imag_i = 1j
+            F_K = N_j * f_j * np.exp ( 2 * np.pi * imag_i ) * np.dot(hkl,[x_j,y_j,z_j]) * np.exp(1) - M_j 
+            return F_K
+
+        L_pK = LorentzPF(x,K,TwoTheta_M)
+        F_K = Structure_Factor(hkl,x_j,y_j,z_j,N_j,f_j, M_j)
 
         y_cal = 0
         for i in range(len(hkl)):
-            Theta_i = self.x        # or variation thereof
-            y_cal+= self.m_K * L_pK * np.abs(self.F_K)**2 * self.phi * (Theta_i - self.Theta_k) * self.P_K * self.A + self.y_bi
+            Theta_i = x        # or variation thereof
+            y_cal+= m_K * L_pK * np.abs(F_K)**2 * phi * (Theta_i - Theta_k) * P_K * A + y_bi
             
-        y_cal*=self.s
+        y_cal*=s
+
+
+
 
 ''' from: https://lmfit.github.io/lmfit-py/model.html'''
 # <examples/doc_model_composite.py>
