@@ -76,73 +76,87 @@ class Data:
         return x,y 
 
 
-def Rietveld(x,s,m_K,K,TwoTheta_M ):
+def Rietveld(x, HKL, atomic_positions, s, m_K, TwoTheta_M, K, N_j, f_j, M_j, phi, Theta_k, P_K, A, y_bi ):
 
         '''Rietveld equation
         Parameters
         ----------
         x : np.array(float)
             array with x-data 2-theta values
-        self.s = 1      # 'scale factor' (const)
-        self.m_K = 2    # 'multiplicity factor' (const - depends on lattice symmetry)
-        .
-        .
-        .
+        
+        HKL:  np.ones((10,3))       # 10 indices
+            Miller indices matrix (more than one hkl)
+        atomic_positions: np.ones((3,20))
+            xj , yj and zj atomic positions
+        
+        s: float
+            'scale factor' (const)
+
+        m_K = 2    
+            'multiplicity factor' (const - depends on lattice symmetry)
+        
+        --Lorentz Polarization Factor (L_pK)--
+        TwoTheta_M : 
+            The Bragg angle of the reflection from a monochromator (it is a constant for a fixed wavelength)
+        K : 
+            Fractional polarization of the beam (Pecharsky)
+
+        --Structure Factor (F_K)--
+        N_j = 
+            'Nj is the site occupancy divided by the site multiplicity'
+        f_j = 
+            'fj is the atomic form factor'
+        M_j = 
+            'M j contains the thermal contributions (atomic displacements)'
+
+
+        phi = 'pseudo-voight; voight, gauss, etc'
+            'Reflection Profile function (string-> conditional)'
+
+        Theta_k = 1         # to fit
+            '2\theta_k: the calculated position of the Bragg peak corrected for the zero-point shift of the counter (Rietveld 1969)'
+
+        P_K = 1        # to fit?4
+            'Preferred orientation i.e. it is a multiplier, which accounts for possible deviations from a complete randomness in the distribution of grain orientations (Pecharsky 2005)'
+
+        A = 
+            'Absorption Factor (formula)'
+
+        y_bi = 
+            'Background'
+
 
         '''
 
-        def LorentzPF(Theta,K,TwoTheta_M ):
+
+        def LorentzPol_Factor(Theta, TwoTheta_M = 1,K=1 ):
             'Lorentz-Polarization factor (this is complex)'
 
             # CTHM = coefficient for monochromator polarization 
-            # TwoTheta_M : The Bragg angle of the reflection from a monochromator (it is a constant for a fixed wavelength)
-            TwoTheta_M = 1
 
             CTHM = np.cos(TwoTheta_M)**2
-            K=1
             L_pK = ( 1 - K +  (K*CTHM*np.cos(2*Theta)**2) ) \
                         / ( ( 2 * (np.sin(Theta))**2 ) * np.cos(Theta) )  
 
             return L_pK
 
-        'Reflection Profile function (string-> conditional)'
-        phi = 'pseudo-voight; voight, gauss, etc'
-
-        '2\theta_k: the calculated position of the Bragg peak corrected for the zero-point shift of the counter (Rietveld 1969)'
-        Theta_k = 1         # to fit
-
-        'Preferred orientation i.e. it is a multiplier, which accounts for possible deviations from a complete randomness in the distribution of grain orientations (Pecharsky 2005)'
-        P_K = 1        # to fit?4
-
-        
-        A = 'Absorption Factor (formula)'
-        y_bi = 'Background'
 
 
-        # N_j = 'Nj is the site occupancy divided by the site multiplicity'
-        # f_j = 'fj is the atomic form factor'
-        # x_j,y_j,z_j = 1,1,1     # xj , yj and zj are the atomic positions 
-        # M_j = 'M j contains the thermal contributions (atomic displacements)'
-
-        # Miller indices (hkl)
-        hkl = [1,1,1]
-        
-        
-        def Structure_Factor(hkl,x_j,y_j,z_j,N_j,f_j, M_j):
+        def Structure_Factor(Miller_indices,atomic_positions,N_j,f_j, M_j):
             'Structure Factor'
             imag_i = 1j
-            F_K = N_j * f_j * np.exp ( 2 * np.pi * imag_i ) * np.dot(hkl,[x_j,y_j,z_j]) * np.exp(1) - M_j 
+            F_K = N_j * f_j * np.exp ( 2 * np.pi * imag_i ) * np.dot(Miller_indices,atomic_positions.T).sum() * np.exp(1) - M_j 
             return F_K
 
-        L_pK = LorentzPF(x,K,TwoTheta_M)
-        F_K = Structure_Factor(hkl,x_j,y_j,z_j,N_j,f_j, M_j)
 
-        y_cal = 0
-        for i in range(len(hkl)):
-            Theta_i = x        # or variation thereof
-            y_cal+= m_K * L_pK * np.abs(F_K)**2 * phi * (Theta_i - Theta_k) * P_K * A + y_bi
+
+        L_pK = LorentzPol_Factor(x,TwoTheta_M,K)
+
+        F_K = Structure_Factor(HKL,atomic_positions,N_j,f_j, M_j)
+
+
+        return s * np.sum( m_K * L_pK *  np.abs(F_K)**2  * phi * (x - Theta_k) * P_K * A ) + y_bi
             
-        y_cal*=s
 
 
 
