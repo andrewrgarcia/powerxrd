@@ -4,3 +4,4 @@ venv/
 dist/
 tests/rawtest.py
 notes.txt
+draft.py

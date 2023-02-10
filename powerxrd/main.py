@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 import scipy.optimize as optimize
 import pandas
 
+from lmfit import CompositeModel, Model
+from lmfit.lineshapes import gaussian, step
+
 
 def braggs(twotheta,lmda=1.54):
     '''interplanar spacing "d_hkl" from Braggs law'''
@@ -52,31 +55,7 @@ def funcgauss(x,y0,a,mean,sigma):
     return y0+(a/(sigma*np.sqrt(2*np.pi)))*np.exp(-(x-mean)**2/(2*sigma*sigma))
 
 
-class Data:
-    def __init__(self,file):
-        '''Data structure.
-        Parameters
-        ----------
-        file : str
-            file name and/or path for XRD file in .xy format
-        '''
-        self.file = file
-
-    
-    def importfile(self):
-
-        if self.file.split(".")[1]=='xy':
-            df = pandas.read_csv(self.file, sep='\t', header=None)   #'https://www.statology.org/pandas-read-text-file/'
-
-        if self.file.split(".")[1]=='csv':
-            df = pandas.read_csv(self.file, header=None)   
-
-
-        x,y = np.array(df).T
-        return x,y 
-
-
-def Rietveld(x, HKL, atomic_positions, s, m_K, TwoTheta_M, K, N_j, f_j, M_j, phi, Theta_k, P_K, A, y_bi ):
+def Rietveld_func(x, HKL, atomic_positions, s, m_K, TwoTheta_M, K, N_j, f_j, M_j, phi, Theta_k, P_K, A, y_bi ):
 
         '''Rietveld equation
         Parameters
@@ -128,7 +107,6 @@ def Rietveld(x, HKL, atomic_positions, s, m_K, TwoTheta_M, K, N_j, f_j, M_j, phi
 
         '''
 
-
         def LorentzPol_Factor(Theta, TwoTheta_M = 1,K=1 ):
             'Lorentz-Polarization factor (this is complex)'
 
@@ -149,7 +127,6 @@ def Rietveld(x, HKL, atomic_positions, s, m_K, TwoTheta_M, K, N_j, f_j, M_j, phi
             return F_K
 
 
-
         L_pK = LorentzPol_Factor(x,TwoTheta_M,K)
 
         F_K = Structure_Factor(HKL,atomic_positions,N_j,f_j, M_j)
@@ -160,71 +137,82 @@ def Rietveld(x, HKL, atomic_positions, s, m_K, TwoTheta_M, K, N_j, f_j, M_j, phi
 
 
 
+class Data:
+    def __init__(self,file):
+        '''Data structure.
+        Parameters
+        ----------
+        file : str
+            file name and/or path for XRD file in .xy format
+        '''
+        self.file = file
 
-''' from: https://lmfit.github.io/lmfit-py/model.html'''
-# <examples/doc_model_composite.py>
-import matplotlib.pyplot as plt
-import numpy as np
+    
+    def importfile(self):
 
-from lmfit import CompositeModel, Model
-from lmfit.lineshapes import gaussian, step
+        if self.file.split(".")[1]=='xy':
+            df = pandas.read_csv(self.file, sep='\t', header=None)   #'https://www.statology.org/pandas-read-text-file/'
 
-# create data from broadened step
-x = np.linspace(0, 10, 201)
-y = step(x, amplitude=12.5, center=4.5, sigma=0.88, form='erf')
-np.random.seed(0)
-y = y + np.random.normal(scale=0.35, size=x.size)
+        if self.file.split(".")[1]=='csv':
+            df = pandas.read_csv(self.file, header=None)   
 
-
-def jump(x, mid):
-    """Heaviside step function."""
-    o = np.zeros(x.size)
-    imid = max(np.where(x <= mid)[0])
-    o[imid:] = 1.0
-    return o
-
-
-def convolve(arr, kernel):
-    """Simple convolution of two arrays."""
-    npts = min(arr.size, kernel.size)
-    pad = np.ones(npts)
-    tmp = np.concatenate((pad*arr[0], arr, pad*arr[-1]))
-    out = np.convolve(tmp, kernel, mode='valid')
-    noff = int((len(out) - npts) / 2)
-    return out[noff:noff+npts]
+        x,y = np.array(df).T
+        return x,y 
 
 
-# create Composite Model using the custom convolution operator
-mod = CompositeModel(Model(jump), Model(gaussian), convolve)
-pars = mod.make_params(amplitude=1, center=3.5, sigma=1.5, mid=5.0)
+class Rietveld:
+    def __init__(self):
+        '''Rietveld structure. Loader of Rietveld equation for refinement.
 
-# 'mid' and 'center' should be completely correlated, and 'mid' is
-# used as an integer index, so a very poor fit variable:
-pars['mid'].vary = False
+        Parameters
+        ----------
+        model : object
+            lmfit.Model object for Rietveld function
+        pars : object
+            lmfit.Model.Parameter objects for Rietveld function   (all initially set to value of 1 as default)      
+        params : list(str)
+            list of Rietveld function parameters 
+        fixed : list(str)
+            list of Rietveld function parameters to fix in Rietveld refinement (default: only 's' is fixed)
+        '''
 
-# fit this model to data array y
-result = mod.fit(y, params=pars, x=x)
+        self.model = Model(Rietveld_func)
+        self.pars = self.model.make_params()
+        self.params = self.model.param_names
+        for i in self.params:
+            self.pars[i].value = 1
+        self.fixed  = ['s']
 
-print(result.fit_report())
 
-# generate components
-comps = result.eval_components(x=x)
+    def refinement(self):
 
-# plot results
-fig, axes = plt.subplots(1, 2, figsize=(12.8, 4.8))
+        # create data from broadened step
+        x = np.linspace(0, 10, 201)
+        y = 2*x
+        np.random.seed(0)
 
-axes[0].plot(x, y, 'bo')
-axes[0].plot(x, result.init_fit, 'k--', label='initial fit')
-axes[0].plot(x, result.best_fit, 'r-', label='best fit')
-axes[0].legend()
+        # params to fix
+        for i in self.fixed:
+            self.pars[i].vary = False
 
-axes[1].plot(x, y, 'bo')
-axes[1].plot(x, 10*comps['jump'], 'k--', label='Jump component')
-axes[1].plot(x, 10*comps['gaussian'], 'r-', label='Gaussian component')
-axes[1].legend()
+        # fit this model to data array y
+        result = self.model.fit(y, params=self.pars, x=x)
 
-plt.show()
-# <end examples/doc_model_composite.py>
+        print(result.fit_report())
+
+        # generate components
+        # comps = result.eval_components(x=x)
+
+        # plot results
+        fig, axes = plt.subplots(1, 2, figsize=(12.8, 4.8))
+
+        axes[0].plot(x, y, 'bo')
+        axes[0].plot(x, result.init_fit, 'k--', label='initial fit')
+        axes[0].plot(x, result.best_fit, 'r-', label='best fit')
+        axes[0].legend()
+
+        plt.show()
+        # <end examples/doc_model_composite.py>
 
 
 class Chart:
