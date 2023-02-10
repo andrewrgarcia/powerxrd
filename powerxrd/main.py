@@ -161,11 +161,19 @@ class Data:
 
 
 class Rietveld:
-    def __init__(self):
+    def __init__(self, x_exp=[],y_exp=[]):
         '''Rietveld structure. Loader of Rietveld equation for refinement.
 
         Parameters
         ----------
+        x_exp : list(float) / np.array(float)
+            x-data theta values (experimental)
+        y_exp : list(float) / np.array(float)
+            y-data              (experimental)
+        HKL : np.array(int)
+            array containing all h,k,l Miller indices.
+        atoms : np.array(float)
+            atomic positions xj yj zj 
         model : object
             lmfit.Model object for Rietveld function
         pars : object
@@ -175,28 +183,28 @@ class Rietveld:
         fixed : list(str)
             list of Rietveld function parameters to fix in Rietveld refinement (default: only 's' is fixed)
         '''
-
+        self.x_exp = x_exp
+        self.y_exp = y_exp
+        self.HKL =  np.ones((4,3))
+        self.atoms = np.ones((12,3))
         self.model = Model(Rietveld_func)
         self.pars = self.model.make_params()
         self.params = self.model.param_names
         for i in self.params:
             self.pars[i].value = 1
+
         self.fixed  = ['s']
 
 
-    def refinement(self):
-
-        # create data from broadened step
-        x = np.linspace(0, 10, 201)
-        y = 2*x
-        np.random.seed(0)
+    def refine(self):
 
         # params to fix
         for i in self.fixed:
             self.pars[i].vary = False
 
         # fit this model to data array y
-        result = self.model.fit(y, params=self.pars, x=x)
+        result = self.model.fit(self.y_exp, params=self.pars, x=self.x_exp)
+
 
         print(result.fit_report())
 
@@ -206,9 +214,9 @@ class Rietveld:
         # plot results
         fig, axes = plt.subplots(1, 2, figsize=(12.8, 4.8))
 
-        axes[0].plot(x, y, 'bo')
-        axes[0].plot(x, result.init_fit, 'k--', label='initial fit')
-        axes[0].plot(x, result.best_fit, 'r-', label='best fit')
+        axes[0].plot(self.x_exp, self.y_exp, 'bo')
+        axes[0].plot(self.x_exp, result.init_fit, 'k--', label='initial fit')
+        axes[0].plot(self.x_exp, result.best_fit, 'r-', label='best fit')
         axes[0].legend()
 
         plt.show()
