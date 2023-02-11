@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="496.37726mm"
+   height="197.39842mm"
+   viewBox="0 0 496.37725 197.39841"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (1:1.2.2+202212051552+b0a8486541)"
+   sodipodi:docname="powerxrd_header.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.30866481"
+     inkscape:cx="748.38463"
+     inkscape:cy="280.23927"
+     inkscape:window-width="1206"
+     inkscape:window-height="656"
+     inkscape:window-x="74"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <rect
+       x="1557.5586"
+       y="436.87003"
+       width="152.21185"
+       height="57.311199"
+       id="rect5549" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3362">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3358" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3360" />
+    </linearGradient>
+    <rect
+       x="222.49858"
+       y="507.5144"
+       width="284.07596"
+       height="267.02496"
+       id="rect1161" />
+    <rect
+       x="-152.28645"
+       y="33.517269"
+       width="257.53622"
+       height="700.9071"
+       id="rect1155" />
+    <rect
+       x="305.3949"
+       y="234.26294"
+       width="152.64188"
+       height="314.63818"
+       id="rect504" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3362"
+       id="linearGradient3364"
+       x1="68.169624"
+       y1="115.24278"
+       x2="137.01042"
+       y2="115.24278"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-4.6379433,-16.483467)">
+    <path
+       style="fill:#ff6600;fill-opacity:1;stroke:none;stroke-width:1.6;stroke-dasharray:none;stroke-opacity:1"
+       d="m 22.203474,178.75017 21.326122,-123.7944 18.91765,124.51848 75.807034,-0.46389 20.79735,-124.790073 25.3984,123.969023 z"
+       id="path446" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,-0.55000001,18.024467)"
+       id="text1153"
+       style="font-size:192px;white-space:pre;shape-inside:url(#rect1155);display:inline;fill:#000000;fill-opacity:1;stroke:#17ff95;stroke-width:4.15748;stroke-opacity:0" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,-0.55000001,18.024467)"
+       id="text1159"
+       style="font-size:192px;white-space:pre;shape-inside:url(#rect1161);display:inline;fill:#000000;fill-opacity:1;stroke:#17ff95;stroke-width:4.15748;stroke-opacity:0" />
+    <path
+       style="fill:#ff7f2a;fill-opacity:0.967664;stroke:none;stroke-width:1.6;stroke-opacity:1"
+       d="m 32.866535,116.85297 9.242848,63.4255 10.879037,-63.06346 -20.121885,-0.36204 v 0"
+       id="path354" />
+    <path
+       style="fill:#ff7f2a;fill-opacity:0.967664;stroke:none;stroke-width:1.6;stroke-opacity:1"
+       d="m 148.65295,116.61532 13.50414,61.65105 9.59374,-62.06157 -23.09788,0.41052"
+       id="path356" />
+    <path
+       style="fill:#d45500;fill-opacity:0.967664;stroke:none;stroke-width:1.6;stroke-opacity:1"
+       d="M 43.529595,54.95577 100.35076,179.2423 159.05163,54.220286 138.25428,179.01036 62.447245,179.47425 43.529595,54.95577 v 0"
+       id="path364" />
+    <path
+       style="fill:#ff9955;fill-opacity:0.967664;stroke:none;stroke-width:1.6;stroke-opacity:1"
+       d="M 62.447245,179.47425 103.33694,53.880278 138.25428,179.01036 62.447245,179.47425 v 0"
+       id="path401" />
+    <path
+       style="fill:#ff7f2a;fill-opacity:0.967664;stroke:none;stroke-width:1.6;stroke-opacity:1"
+       d="m 82.892091,116.67726 17.458669,62.56504 20.44485,-62.79698 z"
+       id="path403" />
+    <text
+       xml:space="preserve"
+       style="font-size:50.8px;font-family:Arial;-inkscape-font-specification:Arial;fill:#009958;stroke:#04c84c;stroke-width:1.982;stroke-dasharray:4.16401, 2.082;stop-color:#000000"
+       x="222.38123"
+       y="88.050751"
+       id="text1671"><tspan
+         sodipodi:role="line"
+         id="tspan1669"
+         style="stroke-width:1.982"
+         x="222.38123"
+         y="88.050751"></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:25.4px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;inline-size:304.275;fill:#009958;stroke:none;stroke-width:1.982;stroke-dasharray:4.16401, 2.082;stop-color:#000000"
+       x="210.44203"
+       y="66.066719"
+       id="text1725"
+       transform="translate(-7.7081463,6.3354036)"><tspan
+         x="210.44203"
+         y="66.066719"
+         id="tspan6377"><tspan
+           style="font-weight:bold;fill:#000000"
+           id="tspan6375">powerXRD
+</tspan></tspan><tspan
+         x="210.44203"
+         y="97.816723"
+         id="tspan6381"><tspan
+           style="font-weight:bold;font-size:11.2889px;fill:#000000"
+           id="tspan6379">A Python package made to handle powder XRD data. 
+</tspan></tspan><tspan
+         x="210.44203"
+         y="129.56672"
+         id="tspan6385"><tspan
+           style="font-weight:bold;font-size:11.2889px;fill:#000000"
+           id="tspan6383">The only known open-source Github project with a </tspan></tspan><tspan
+         x="210.44203"
+         y="161.31672"
+         id="tspan6389"><tspan
+           style="font-weight:bold;font-size:11.2889px;fill:#000000"
+           id="tspan6387">Rietveld refinement method in development  </tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:25.4px;font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.982;stroke-dasharray:4.16401, 2.082;stroke-opacity:1;stop-color:#000000"
+       x="212.16595"
+       y="99.270332"
+       id="text3337"><tspan
+         sodipodi:role="line"
+         id="tspan3335"
+         style="stroke-width:1.982"
+         x="212.16595"
+         y="99.270332"></tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,4.6379434,16.483468)"
+       id="text5547"
+       style="font-size:48px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect5549);fill:#000000;fill-opacity:1;stroke:none;stroke-width:7.49102;stroke-dasharray:15.738, 7.86898;stroke-opacity:1;stop-color:#000000" />
+  </g>
+</svg>
