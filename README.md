@@ -14,7 +14,7 @@ pip install powerxrd
 ## Just starting? Check out the Colab notebook (click on below icon)
 
 <a href="https://colab.research.google.com/drive/1_Eq-cW6LSPPnaRjkbeHaC81Wfbd8mQS-?usp=sharing">
-<img src="https://github.com/andrewrgarcia/powerxrd/blob/main/img/colab.png?raw=true" width="300" ></a>
+<img src="https://raw.githubusercontent.com/andrewrgarcia/powerxrd/main/docs/img/colaboratory.svg?raw=true" width="300" ></a>
 
 
 ## Contributing
