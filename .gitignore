@@ -5,3 +5,5 @@ dist/
 tests/rawtest.py
 notes.txt
 draft.py
+
+docs/build

@@ -139,7 +139,9 @@ def Rietveld_func(x, HKL, atomic_positions, s, m_K, TwoTheta_M, K, N_j, f_j, M_j
 
 class Data:
     def __init__(self,file):
-        '''Data structure.
+        '''
+        Data structure.
+
         Parameters
         ----------
         file : str
@@ -162,7 +164,8 @@ class Data:
 
 class Rietveld:
     def __init__(self, x_exp=[],y_exp=[]):
-        '''Rietveld structure. Loader of Rietveld equation for refinement.
+        '''
+        Rietveld structure. Loader of Rietveld equation for refinement.
 
         Parameters
         ----------
@@ -226,7 +229,8 @@ class Rietveld:
 class Chart:
 
     def __init__(self,x,y):
-        '''Chart structure. Constructs x-y XRD data to manipulate and analyze. 
+        '''
+        Chart structure. Constructs x-y XRD data to manipulate and analyze. 
 
         Parameters
         ----------
@@ -237,9 +241,9 @@ class Chart:
         K : float
             dimensionless shape factor for Scherrer equation (default 0.9)
         lambdaKa : float
-            X-ray wavelength of \alpha radiation
+            X-ray wavelength of alpha radiation
         lambdaKi : float
-            X-ray wavelength of "i" radiation (\beta, \gamma, other)
+            X-ray wavelength of "i" radiation (beta, gamma, other)
         '''
         self.x          = x          # x values
         self.y          = y          # y values
@@ -480,19 +484,24 @@ class Chart:
 
 
     def backsub(self,tol=1,show=False):
-        '''Background subtraction operation
-        inputs:
-            tol - tolerance (see below)
-        outputs: 
-            x
-            y
+        '''
+        Background subtraction operation.This function is a running conditional statement 
+        which evaluates whether a small increase in the x-direction will increase the magnitude of the 
+        y variable beyond a certain tolerance.
 
-        This function is a running conditional statement 
-        which evaluates whether a small increase 
-        in the x-direction will increase the magnitude of the 
-        y variable beyond a certain tolerance
-        
-        this tolerance ('tol') value may be adjusted as an input'''
+        Parameters
+        ----------
+        tol : float, optional
+            Tolerance for background subtraction.
+            The function evaluates whether a small increase in the x-direction will increase the magnitude
+            of the y variable beyond a certain tolerance value. This tolerance value is defined as a
+            percentage of the y variable at each point. Peaks above this tolerance are considered and
+            their background is removed.
+            Default value is 1.
+        show : bool, optional
+            Whether to show the plot of the XRD chart.
+            Default value is False.
+        '''
         
         L=len(self.y)
         lmda = int(0.50*L/(self.x[0]-self.x[L-1]))         #   'approx. # points for half width of peaks'

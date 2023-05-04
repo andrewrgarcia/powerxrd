@@ -89,9 +89,9 @@ class Chart:
         K : float
             dimensionless shape factor for Scherrer equation (default 0.9)
         lambdaKa : float
-            X-ray wavelength of \alpha radiation
+            X-ray wavelength of alpha radiation
         lambdaKi : float
-            X-ray wavelength of "i" radiation (\beta, \gamma, other)
+            X-ray wavelength of "i" radiation (beta, gamma, other)
         '''
         self.x          = x          # x values
         self.y          = y          # y values
