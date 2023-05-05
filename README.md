@@ -11,7 +11,10 @@ The only known open-source Github project with a Rietveld refinement method in d
 pip install powerxrd
 ```
 
-## Just starting? Check out the Colab notebook (click on below icon)
+## Just starting? Check out the below options
+
+<a href="https://powerxrd.readthedocs.io/en/latest">
+<img src="https://raw.githubusercontent.com/andrewrgarcia/voxelmap/main/docs/img/readthedocs.png?raw=true" width="250" ></a>
 
 <a href="https://colab.research.google.com/drive/1_Eq-cW6LSPPnaRjkbeHaC81Wfbd8mQS-?usp=sharing">
 <img src="https://raw.githubusercontent.com/andrewrgarcia/powerxrd/main/docs/img/colaboratory.svg?raw=true" width="300" ></a>

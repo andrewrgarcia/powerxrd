@@ -200,6 +200,27 @@ class Rietveld:
 
 
     def refine(self):
+        '''
+        Performs Rietveld refinement on the experimental data.
+
+        This function uses the fixed parameters specified by the user to perform a Rietveld refinement on the experimental data. 
+        It then generates a report of the fit results and plots the data with the initial and best fits. Data is then saved in a format to be loaded to the Chart class for 
+        additional plot processing. 
+
+        Example Usage:
+        To refine the data from 'my_data.xy' file:
+
+        .. code-block:: python
+
+            import powerxrd as xrd
+
+            x, y = xrd.Data('my_data.xy').importfile()      # Import data from file
+            model = xrd.Rietveld(x, y)                      # Create Rietveld model
+            .
+            .
+            .            
+            model.refine()                                  # Perform Rietveld refinement
+        '''
 
         # params to fix
         for i in self.fixed:
