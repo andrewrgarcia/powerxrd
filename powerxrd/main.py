@@ -56,56 +56,51 @@ def funcgauss(x,y0,a,mean,sigma):
 
 
 def Rietveld_func(x, HKL, atomic_positions, s, m_K, TwoTheta_M, K, N_j, f_j, M_j, phi, Theta_k, P_K, A, y_bi ):
+        """
+        Rietveld equation.
 
-        '''Rietveld equation
         Parameters
         ----------
-        x : np.array(float)
-            array with x-data 2-theta values
+        x : array(float)
+            Array with x-data 2-theta values.
+        HKL : array((num_indices,3)) 
+            Miller indices matrix (more than one hkl).
+        atomic_positions : array((3, num_atoms)) 
+            xj, yj and zj atomic positions.
+        s : float
+            Scale factor (constant).
+            
+        # Lorentz-Polarization Factor (L_pK) sub-group
+        TwoTheta_M : float
+            The Bragg angle of the reflection from a monochromator (it is a constant for a fixed wavelength).
+        K : float
+            Fractional polarization of the beam (Pecharsky).
         
-        HKL:  np.ones((10,3))       # 10 indices
-            Miller indices matrix (more than one hkl)
-        atomic_positions: np.ones((3,20))
-            xj , yj and zj atomic positions
+        # Structure Factor (F_K) sub-group
+        N_j : array((num_atoms))
+            'Nj is the site occupancy divided by the site multiplicity'.
+        f_j : array((num_atoms))
+            'fj is the atomic form factor'.
+        M_j : array((num_atoms))
+            'M j contains the thermal contributions (atomic displacements)'.
         
-        s: float
-            'scale factor' (const)
+        phi : str
+            Reflection profile function (e.g. 'pseudo-voight', 'voight', 'gauss', etc.).
+        Theta_k : float
+            '2\theta_k: the calculated position of the Bragg peak corrected for the zero-point shift of the counter (Rietveld 1969)' # to fit.
+        P_K : float
+            Preferred orientation i.e. it is a multiplier, which accounts for possible deviations from a complete randomness in the distribution of grain orientations (Pecharsky 2005). # to fit.
+        A : float
+            Absorption factor (formula).
+        y_bi : float
+            Background.
+            
+        Returns
+        -------
+        float
+            Value of the Rietveld function.
+        """
 
-        m_K = 2    
-            'multiplicity factor' (const - depends on lattice symmetry)
-        
-        --Lorentz Polarization Factor (L_pK)--
-        TwoTheta_M : 
-            The Bragg angle of the reflection from a monochromator (it is a constant for a fixed wavelength)
-        K : 
-            Fractional polarization of the beam (Pecharsky)
-
-        --Structure Factor (F_K)--
-        N_j = 
-            'Nj is the site occupancy divided by the site multiplicity'
-        f_j = 
-            'fj is the atomic form factor'
-        M_j = 
-            'M j contains the thermal contributions (atomic displacements)'
-
-
-        phi = 'pseudo-voight; voight, gauss, etc'
-            'Reflection Profile function (string-> conditional)'
-
-        Theta_k = 1         # to fit
-            '2\theta_k: the calculated position of the Bragg peak corrected for the zero-point shift of the counter (Rietveld 1969)'
-
-        P_K = 1        # to fit?4
-            'Preferred orientation i.e. it is a multiplier, which accounts for possible deviations from a complete randomness in the distribution of grain orientations (Pecharsky 2005)'
-
-        A = 
-            'Absorption Factor (formula)'
-
-        y_bi = 
-            'Background'
-
-
-        '''
 
         def LorentzPol_Factor(Theta, TwoTheta_M = 1,K=1 ):
             'Lorentz-Polarization factor (this is complex)'

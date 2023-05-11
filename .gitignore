@@ -2,7 +2,9 @@ __pycache__
 *.egg-info/
 venv/
 dist/
-tests/rawtest.py
+rawtest.py
+vectorfit.py
+
 notes.txt
 draft.py
 
