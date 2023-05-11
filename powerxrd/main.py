@@ -57,7 +57,7 @@ def funcgauss(x,y0,a,mean,sigma):
 
 def Rietveld_func(x, HKL, atomic_positions, s, m_K, TwoTheta_M, K, N_j, f_j, M_j, phi, Theta_k, P_K, A, y_bi ):
         """
-        Rietveld equation.
+        Calculate the Rietveld equation for crystal structure analysis.
 
         Parameters
         ----------
@@ -69,21 +69,16 @@ def Rietveld_func(x, HKL, atomic_positions, s, m_K, TwoTheta_M, K, N_j, f_j, M_j
             xj, yj and zj atomic positions.
         s : float
             Scale factor (constant).
-            
-        # Lorentz-Polarization Factor (L_pK) sub-group
         TwoTheta_M : float
-            The Bragg angle of the reflection from a monochromator (it is a constant for a fixed wavelength).
+            The Bragg angle of the reflection from a monochromator (it is a constant for a fixed wavelength).         # Lorentz-Polarization Factor (L_pK) sub-group
         K : float
             Fractional polarization of the beam (Pecharsky).
-        
-        # Structure Factor (F_K) sub-group
         N_j : array((num_atoms))
-            'Nj is the site occupancy divided by the site multiplicity'.
+            'Nj is the site occupancy divided by the site multiplicity'.         # Structure Factor (F_K) sub-group
         f_j : array((num_atoms))
             'fj is the atomic form factor'.
         M_j : array((num_atoms))
             'M j contains the thermal contributions (atomic displacements)'.
-        
         phi : str
             Reflection profile function (e.g. 'pseudo-voight', 'voight', 'gauss', etc.).
         Theta_k : float
@@ -94,13 +89,7 @@ def Rietveld_func(x, HKL, atomic_positions, s, m_K, TwoTheta_M, K, N_j, f_j, M_j
             Absorption factor (formula).
         y_bi : float
             Background.
-            
-        Returns
-        -------
-        float
-            Value of the Rietveld function.
         """
-
 
         def LorentzPol_Factor(Theta, TwoTheta_M = 1,K=1 ):
             'Lorentz-Polarization factor (this is complex)'
@@ -113,21 +102,29 @@ def Rietveld_func(x, HKL, atomic_positions, s, m_K, TwoTheta_M, K, N_j, f_j, M_j
 
             return L_pK
 
-
-
-        def Structure_Factor(Miller_indices,atomic_positions,N_j,f_j, M_j):
+        def Structure_Factor_K(Theta, Miller_indices_K,atomic_positions,N_j,f_j):
             'Structure Factor'
             imag_i = 1j
-            F_K = N_j * f_j * np.exp ( 2 * np.pi * imag_i ) * np.dot(Miller_indices,atomic_positions.T).sum() * np.exp(1) - M_j 
+            u_s = 1
+            lmbda = 1
+
+            h,k,l = Miller_indices_K
+            M_j = 8 * (np.pi**2) * (u_s**2) * np.sin(Theta)**2 / (lmbda**2)
+
+            F_K = []
+            for a in atomic_positions: 
+                x,y,z  = a
+                F_K.append( N_j * f_j * np.exp ( 2 * np.pi * imag_i ) * (h*x + k*y + l*z)  * np.exp(1) - M_j )
+            
             return F_K
 
+        sum_component = []
+        for HKL_K in HKL:
+            L_pK = LorentzPol_Factor(x,TwoTheta_M,K)
+            F_K = Structure_Factor_K(x, HKL_K,atomic_positions,N_j,f_j)
+            sum_component.extend( m_K * L_pK *  np.abs(F_K)**2  * phi * (x - Theta_k) * P_K * A  + y_bi )
 
-        L_pK = LorentzPol_Factor(x,TwoTheta_M,K)
-
-        F_K = Structure_Factor(HKL,atomic_positions,N_j,f_j, M_j)
-
-
-        return s * np.sum( m_K * L_pK *  np.abs(F_K)**2  * phi * (x - Theta_k) * P_K * A ) + y_bi
+        return s * sum_component
             
 
 
