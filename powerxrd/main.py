@@ -145,7 +145,7 @@ class Data:
     def importfile(self):
 
         if self.file.split(".")[1]=='xy':
-            df = pandas.read_csv(self.file, sep='\t', header=None)   #'https://www.statology.org/pandas-read-text-file/'
+            df = pandas.read_csv(self.file, sep=r'\s+', header=None)   #'https://www.statology.org/pandas-read-text-file/'
 
         if self.file.split(".")[1]=='csv':
             df = pandas.read_csv(self.file, header=None)   
