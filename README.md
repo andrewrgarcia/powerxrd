@@ -1,4 +1,6 @@
 # powerxrd
+[![Documentation Status](https://readthedocs.org/projects/powerxrd/badge/?version=latest)](https://powerxrd.readthedocs.io/en/latest/?badge=latest)
+
 A Python package made to handle powder XRD (and XRD) data. 
 The only known open-source Github project with a Rietveld refinement method in development. 
 
