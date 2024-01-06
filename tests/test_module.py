@@ -6,7 +6,7 @@ def test_isofncs():
     '''test isolated functions'''
 
     print(xrd.braggs(np.array([6.7,34.13,12.87]),lmda=1.54))
-    print(xrd.braggs_s(2.3,lmda=1.54))
+    print(xrd.braggs(2.3,lmda=1.54,is_scalar=True))
     print(xrd.scherrer(K=.9,lmda=2,beta=1,theta=24))
 
 

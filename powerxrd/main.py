@@ -3,46 +3,33 @@ import matplotlib.pyplot as plt
 import scipy.optimize as optimize
 import pandas
 
-from lmfit import CompositeModel, Model
-from lmfit.lineshapes import gaussian, step
+def braggs(twotheta, lmda=1.54, is_scalar=False):
+    '''
+    Calculate interplanar spacing "d_hkl" from Bragg's law.
+    - twotheta: Angle in degrees, can be a scalar or an array.
+    - lmda: Wavelength in Angstroms, default is 1.54.
+    - is_scalar: Flag to indicate if twotheta is a scalar (True) or an array (False).
+    '''
+    twothet_rad = twotheta * np.pi / 180
 
-
-def braggs(twotheta,lmda=1.54):
-    '''interplanar spacing "d_hkl" from Braggs law'''
-
-    'lambda in Angstroms'
-    twothet_rad=twotheta*np.pi/180
-    
-#    dhkl = lmda /(2*np.sin(twothet_rad/2))
-    
-    if twotheta.any() < 5:
-        L =len(twotheta)
-        dhkl = np.zeros(L)
-        dhkl[0] = 'inf'
-        
-        k =1
-        while k < L:
-            dhkl[k] = lmda /(2*np.sin(twothet_rad[k]/2))
-            k+=1
+    if is_scalar:
+        if twotheta < 5:
+            return 'inf'
+        else:
+            dhkl = lmda / (2 * np.sin(twothet_rad / 2))
+            return np.round(dhkl, 2)
     else:
-        dhkl = lmda /(2*np.sin(twothet_rad/2))
-    
-    dhkl = np.round(dhkl,2)
-    return dhkl
+        if np.any(twotheta < 5):
+            L = len(twotheta)
+            dhkl = np.zeros(L)
+            dhkl[0] = np.inf
 
-def braggs_s(twotheta,lmda=1.54):
-    'lambda in Angstroms'
-    twothet_rad=twotheta*np.pi/180
-    
-    
-    if twotheta < 5:
-        dhkl = 'inf'
-    else:
-        dhkl = lmda /(2*np.sin(twothet_rad/2))
-        dhkl = np.round(dhkl,2)
-    
-    return dhkl
+            for k in range(1, L):
+                dhkl[k] = lmda / (2 * np.sin(twothet_rad[k] / 2)) if twotheta[k] >= 5 else 'inf'
+        else:
+            dhkl = lmda / (2 * np.sin(twothet_rad / 2))
 
+        return np.round(dhkl, 2)
 
 def scherrer(K,lmda,beta,theta):
     '''Scherrer equation'''
@@ -53,79 +40,6 @@ def scherrer(K,lmda,beta,theta):
 def funcgauss(x,y0,a,mean,sigma):
     '''Gaussian equation'''
     return y0+(a/(sigma*np.sqrt(2*np.pi)))*np.exp(-(x-mean)**2/(2*sigma*sigma))
-
-
-def Rietveld_func(x, HKL, atomic_positions, s, m_K, TwoTheta_M, K, N_j, f_j, M_j, phi, Theta_k, P_K, A, y_bi ):
-        """
-        Calculate the Rietveld equation for crystal structure analysis.
-
-        Parameters
-        ----------
-        x : array(float)
-            Array with x-data 2-theta values.
-        HKL : array((num_indices,3)) 
-            Miller indices matrix (more than one hkl).
-        atomic_positions : array((3, num_atoms)) 
-            xj, yj and zj atomic positions.
-        s : float
-            Scale factor (constant).
-        TwoTheta_M : float
-            The Bragg angle of the reflection from a monochromator (it is a constant for a fixed wavelength).         # Lorentz-Polarization Factor (L_pK) sub-group
-        K : float
-            Fractional polarization of the beam (Pecharsky).
-        N_j : array((num_atoms))
-            'Nj is the site occupancy divided by the site multiplicity'.         # Structure Factor (F_K) sub-group
-        f_j : array((num_atoms))
-            'fj is the atomic form factor'.
-        M_j : array((num_atoms))
-            'M j contains the thermal contributions (atomic displacements)'.
-        phi : str
-            Reflection profile function (e.g. 'pseudo-voight', 'voight', 'gauss', etc.).
-        Theta_k : float
-            '2\theta_k: the calculated position of the Bragg peak corrected for the zero-point shift of the counter (Rietveld 1969)' # to fit.
-        P_K : float
-            Preferred orientation i.e. it is a multiplier, which accounts for possible deviations from a complete randomness in the distribution of grain orientations (Pecharsky 2005). # to fit.
-        A : float
-            Absorption factor (formula).
-        y_bi : float
-            Background.
-        """
-
-        def LorentzPol_Factor(Theta, TwoTheta_M = 1,K=1 ):
-            'Lorentz-Polarization factor (this is complex)'
-
-            # CTHM = coefficient for monochromator polarization 
-
-            CTHM = np.cos(TwoTheta_M)**2
-            L_pK = ( 1 - K +  (K*CTHM*np.cos(2*Theta)**2) ) \
-                        / ( ( 2 * (np.sin(Theta))**2 ) * np.cos(Theta) )  
-
-            return L_pK
-
-        def Structure_Factor_K(Theta, Miller_indices_K,atomic_positions,N_j,f_j):
-            'Structure Factor'
-            imag_i = 1j
-            u_s = 1
-            lmbda = 1
-
-            h,k,l = Miller_indices_K
-            M_j = 8 * (np.pi**2) * (u_s**2) * np.sin(Theta)**2 / (lmbda**2)
-
-            F_K = []
-            for a in atomic_positions: 
-                x,y,z  = a
-                F_K.append( N_j * f_j * np.exp ( 2 * np.pi * imag_i ) * (h*x + k*y + l*z)  * np.exp(1) - M_j )
-            
-            return F_K
-
-        sum_component = []
-        for HKL_K in HKL:
-            L_pK = LorentzPol_Factor(x,TwoTheta_M,K)
-            F_K = Structure_Factor_K(x, HKL_K,atomic_positions,N_j,f_j)
-            sum_component.extend( m_K * L_pK *  np.abs(F_K)**2  * phi * (x - Theta_k) * P_K * A  + y_bi )
-
-        return s * sum_component
-            
 
 
 
@@ -153,90 +67,6 @@ class Data:
         x,y = np.array(df).T
         return x,y 
 
-
-class Rietveld:
-    def __init__(self, x_exp=[],y_exp=[]):
-        '''
-        Rietveld structure. Loader of Rietveld equation for refinement.
-
-        Parameters
-        ----------
-        x_exp : list(float) / np.array(float)
-            x-data theta values (experimental)
-        y_exp : list(float) / np.array(float)
-            y-data              (experimental)
-        HKL : np.array(int)
-            array containing all h,k,l Miller indices.
-        atoms : np.array(float)
-            atomic positions xj yj zj 
-        model : object
-            lmfit.Model object for Rietveld function
-        pars : object
-            lmfit.Model.Parameter objects for Rietveld function   (all initially set to value of 1 as default)      
-        params : list(str)
-            list of Rietveld function parameters 
-        fixed : list(str)
-            list of Rietveld function parameters to fix in Rietveld refinement (default: only 's' is fixed)
-        '''
-        self.x_exp = x_exp
-        self.y_exp = y_exp
-        self.HKL =  np.ones((4,3))
-        self.atoms = np.ones((12,3))
-        self.model = Model(Rietveld_func)
-        self.pars = self.model.make_params()
-        self.params = self.model.param_names
-        for i in self.params:
-            self.pars[i].value = 1
-
-        self.fixed  = ['s']
-
-
-    def refine(self):
-        '''
-        Performs Rietveld refinement on the experimental data.
-
-        This function uses the fixed parameters specified by the user to perform a Rietveld refinement on the experimental data. 
-        It then generates a report of the fit results and plots the data with the initial and best fits. Data is then saved in a format to be loaded to the Chart class for 
-        additional plot processing. 
-
-        Example Usage:
-        To refine the data from 'my_data.xy' file:
-
-        .. code-block:: python
-
-            import powerxrd as xrd
-
-            x, y = xrd.Data('my_data.xy').importfile()      # Import data from file
-            model = xrd.Rietveld(x, y)                      # Create Rietveld model
-            .
-            .
-            .            
-            model.refine()                                  # Perform Rietveld refinement
-        '''
-
-        # params to fix
-        for i in self.fixed:
-            self.pars[i].vary = False
-
-        # fit this model to data array y
-        result = self.model.fit(self.y_exp, params=self.pars, x=self.x_exp)
-
-
-        print(result.fit_report())
-
-        # generate components
-        # comps = result.eval_components(x=x)
-
-        # plot results
-        fig, axes = plt.subplots(1, 2, figsize=(12.8, 4.8))
-
-        axes[0].plot(self.x_exp, self.y_exp, 'bo')
-        axes[0].plot(self.x_exp, result.init_fit, 'k--', label='initial fit')
-        axes[0].plot(self.x_exp, result.best_fit, 'r-', label='best fit')
-        axes[0].legend()
-
-        plt.show()
-        # <end examples/doc_model_composite.py>
 
 
 class Chart:
