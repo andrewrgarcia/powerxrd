@@ -99,17 +99,26 @@ class RietveldRefiner:
         self.fixed_params = [p for p in self.fixed_params if p not in params_to_release]
 
     def refine(self):
-        # Prepare parameters for least squares that are not fixed
-        params_to_refine = {k: v for k, v in self.parameters.items() if k not in self.fixed_params}
-        
-        # The optimization function should be able to handle parameters as arrays/matrices
+        params_to_refine = self._get_refinable_parameters(self.parameters)
+        packed_initial_params = self._pack_parameters(params_to_refine)
         result = least_squares(
             self._residuals, 
-            x0=self._pack_parameters(params_to_refine), 
+            packed_initial_params, 
             args=(self.x_data, self.y_data)
         )
-        # Unpack results back into model parameters
-        self.parameters.update(self._unpack_parameters(result.x, params_to_refine))
+        # Unpack the results and update the model parameters
+        updated_params, _ = self._unpack_parameters(result.x, params_to_refine)
+        self.model.update_parameters(updated_params)
+
+    def _get_refinable_parameters(self, params):
+        # Filter out the parameters not marked for refinement
+        refinable_params = {}
+        for key, value in params.items():
+            if isinstance(value, list) and value[1]:  # If it's marked for refinement
+                refinable_params[key] = value
+            elif isinstance(value, dict):
+                refinable_params[key] = self._get_refinable_parameters(value)
+        return refinable_params
 
     def _residuals(self, packed_params, x_data, y_data):
         # Unpack parameters and update the model
