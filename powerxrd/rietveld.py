@@ -13,12 +13,35 @@ class Model:
     def __init__(self):
         # Initialize with default parameters or load from a file/database
         self.params = {
-            'lattice_constants': {'a': 1.0, 'b': 1.0, 'c': 1.0, 'alpha': 90, 'beta': 90, 'gamma': 90},
-            'atomic_positions': [],  # List of dictionaries for each atom in the unit cell
+            'scale': [1.0, True],
+            'overall_B': [0.0, True],
+            'lattice_constants': {
+                'a': [5.431, True],
+                'b': [5.431, True],
+                'c': [5.431, True],
+                'alpha': [90.0, False],
+                'beta': [90.0, False],
+                'gamma': [90.0, False],
+            },
+            'FWHM_parameters': {
+                'U': [0.004, True],
+                'V': [-0.00761, False],
+                'W': [0.005, True],
+                'X': [0.01896, False]
+            },
+            'shape_parameters': {
+                # ... other shape parameters ...
+            },
+            # ... other parameters ...
+            'atomic_positions': [
+                {'element': 'Cu', 'x': [0.0, True], 'y': [0.0, False], 'z': [0.0, True], 'occupancy': [1.0, True], 'B_iso': [0.5, True]},
+                {'element': 'O', 'x': [0.5, True], 'y': [0.5, True], 'z': [0.5, True], 'occupancy': [1.0, True], 'B_iso': [0.5, True]},
+                # ... more atoms
+            ],
             'background_params': [0, 0],  # Example for a linear background
             # ... other parameters like peak shape parameters, etc.
         }
-        
+
     def initial_parameters(self):
         # Return initial guess of parameters
         return self.params
@@ -34,11 +57,16 @@ class Model:
             y_calc += np.random.normal(0, 0.1, size=y_calc.shape)
         return y_calc
 
-    def update_parameters(self, new_params):
-        # Update the model parameters with new values from the refinement process
-        for param in new_params:
-            if param in self.params:
-                self.params[param] = new_params[param]
+
+    def update_parameter(self, param_path, value, refine_flag=None):
+        """Update the value of a parameter by its path, optionally setting its refine flag."""
+        keys = param_path.split('.')
+        param = self.params
+        for key in keys[:-1]:
+            param = param[key]
+        param[keys[-1]][0] = value
+        if refine_flag is not None:
+            param[keys[-1]][1] = refine_flag
     
     def add_atom(self, atomic_position, atom_type):
         # Method to add an atom to the atomic_positions
@@ -46,6 +74,11 @@ class Model:
 
     # You can add more methods as needed, such as methods to handle specific kinds of parameters,
     # export the model to a file, visualize the structure, etc.
+        
+
+# Example usage to update lattice constant 'a' and its refinement flag
+model = Model()
+model.update_parameter('lattice_constants.a', 5.432, True)  # Update value and set to refine
 
 
 
@@ -89,18 +122,27 @@ class RietveldRefiner:
         return residuals
 
     def _pack_parameters(self, params):
-        # Convert the parameters dictionary into a format suitable for least_squares
-        return np.concatenate([np.atleast_1d(v) for v in params.values()])
+        packed_params = []
+        for param, value in params.items():
+            if isinstance(value, list) and isinstance(value[0], list):  # This is a complex parameter like atomic_positions
+                for item in value:
+                    if item[1]:  # Only pack this parameter if it's not fixed
+                        packed_params.append(item[0])
+            else:
+                packed_params.append(value)
+        return np.array(packed_params)
 
     def _unpack_parameters(self, packed_params, params_template):
-        # Convert the packed parameter array back into the parameters dictionary
         unpacked_params = {}
         i = 0
-        for k, v in params_template.items():
-            size = np.size(v)
-            unpacked_params[k] = packed_params[i:i+size]
-            if size == 1:
-                unpacked_params[k] = unpacked_params[k][0]  # Convert back to scalar if necessary
-            i += size
+        for param, value in params_template.items():
+            if isinstance(value, list) and isinstance(value[0], list):  # This is a complex parameter like atomic_positions
+                for j in range(len(value)):
+                    if value[j][1]:  # Only unpack this parameter if it's not fixed
+                        value[j][0] = packed_params[i]
+                        i += 1
+                unpacked_params[param] = value
+            else:
+                unpacked_params[param] = packed_params[i]
+                i += 1
         return unpacked_params
-
