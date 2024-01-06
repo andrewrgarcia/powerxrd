@@ -123,13 +123,14 @@ class RietveldRefiner:
 
     def _pack_parameters(self, params):
         packed_params = []
-        for param, value in params.items():
-            if isinstance(value, list) and isinstance(value[0], list):  # This is a complex parameter like atomic_positions
-                for item in value:
-                    if item[1]:  # Only pack this parameter if it's not fixed
-                        packed_params.append(item[0])
-            else:
-                packed_params.append(value)
+        for key, value in params.items():
+            if isinstance(value, list):
+                # Check if the parameter is marked for refinement.
+                if value[1]:  # value[1] is the boolean flag for refinement
+                    packed_params.append(value[0])
+            elif isinstance(value, dict):
+                # Recursively pack parameters from nested dictionaries
+                packed_params.extend(self._pack_parameters(value))
         return np.array(packed_params)
 
     def _unpack_parameters(self, packed_params, params_template):
