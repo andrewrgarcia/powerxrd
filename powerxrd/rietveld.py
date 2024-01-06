@@ -136,14 +136,30 @@ class RietveldRefiner:
     def _unpack_parameters(self, packed_params, params_template):
         unpacked_params = {}
         i = 0
-        for param, value in params_template.items():
-            if isinstance(value, list) and isinstance(value[0], list):  # This is a complex parameter like atomic_positions
-                for j in range(len(value)):
-                    if value[j][1]:  # Only unpack this parameter if it's not fixed
-                        value[j][0] = packed_params[i]
-                        i += 1
-                unpacked_params[param] = value
-            else:
-                unpacked_params[param] = packed_params[i]
-                i += 1
-        return unpacked_params
+        for key, template_value in params_template.items():
+            if isinstance(template_value, list):
+                current_value, refine_flag = template_value
+                if refine_flag:
+                    # Only update parameters that were refined
+                    current_value = packed_params[i]
+                    i += 1
+                unpacked_params[key] = [current_value, refine_flag]
+            elif isinstance(template_value, dict):
+                # Recursively unpack parameters for nested dictionaries
+                num_params_to_unpack = self._count_refinable_parameters(template_value)
+                unpacked_value, i = self._unpack_parameters(
+                    packed_params[i:i + num_params_to_unpack], template_value
+                )
+                unpacked_params[key] = unpacked_value
+        return unpacked_params, i
+
+    def _count_refinable_parameters(self, params):
+        # Helper function to count the number of parameters marked for refinement
+        count = 0
+        for value in params.values():
+            if isinstance(value, list) and value[1]:  # If it's a refinable parameter
+                count += 1
+            elif isinstance(value, dict):
+                count += self._count_refinable_parameters(value)
+        return count
+
