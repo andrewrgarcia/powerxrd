@@ -22,53 +22,6 @@ The Rietveld equation
     F_K = \sum_j N_j f_j \exp \left[ 2\pi i (h x_j + k y_j + l z_j) \right] \exp \left[ -M_j \right]
 
     M_j = 8 \pi^2 u_s ^2 sin^2 \theta / \lambda^2
-
-
-.. code-block:: python
-
-    def Rietveld_func(x, HKL, atomic_positions, s, m_K, TwoTheta_M, K, N_j, f_j, M_j, phi, Theta_k, P_K, A, y_bi ):
-
-    .
-    .
-    .
-
-        def LorentzPol_Factor(Theta, TwoTheta_M = 1,K=1 ):
-            'Lorentz-Polarization factor (this is complex)'
-
-            # CTHM = coefficient for monochromator polarization 
-
-            CTHM = np.cos(TwoTheta_M)**2
-            L_pK = ( 1 - K +  (K*CTHM*np.cos(2*Theta)**2) ) \
-                        / ( ( 2 * (np.sin(Theta))**2 ) * np.cos(Theta) )  
-
-            return L_pK
-
-        def Structure_Factor_K(Theta, Miller_indices_K,atomic_positions,N_j,f_j):
-            'Structure Factor'
-            imag_i = 1j
-            u_s = 1
-            lmbda = 1
-            
-            h,k,l = Miller_indices_K
-            M_j = 8 * (np.pi**2) * (u_s**2) * np.sin(Theta)**2 / (lmbda**2)
-
-            F_K = []
-            for a in atomic_positions: 
-                x,y,z  = a
-                F_K.append( N_j * f_j * np.exp ( 2 * np.pi * imag_i ) * (h*x + k*y + l*z)  * np.exp(1) - M_j )
-            
-            return F_K
-
-        sum_component = []
-        for HKL_K in HKL:
-            L_pK = LorentzPol_Factor(x,TwoTheta_M,K)
-            F_K = Structure_Factor_K(x, HKL_K,atomic_positions,N_j,f_j)
-            sum_component.extend( m_K * L_pK *  np.abs(F_K)**2  * phi * (x - Theta_k) * P_K * A  + y_bi )
-
-        return s * sum_component
-
-
-.. autoclass:: powerxrd.Rietveld_func
     
 
 
