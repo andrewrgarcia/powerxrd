@@ -2,13 +2,6 @@ import numpy as np
 from scipy.optimize import least_squares
 
 
-atomic_positions_example = [
-    {'element': 'Cu', 'x': 0.0, 'y': 0.0, 'z': 0.0, 'occupancy': 1.0, 'B_iso': 0.5},
-    {'element': 'O', 'x': 0.5, 'y': 0.5, 'z': 0.5, 'occupancy': 1.0, 'B_iso': 0.5},
-    # ... more atoms
-]
-
-
 class Model:
     def __init__(self):
         # Initialize with default parameters or load from a file/database
@@ -99,20 +92,28 @@ class RietveldRefiner:
         self.parameters = model_instance.initial_parameters()  # Store initial model parameters
         self.fixed_params = []  # Keep track of which parameters are fixed
 
-    def fix_parameters(self, params_to_fix):
-        # params_to_fix could be a list of parameter names to fix
-        self.fixed_params.extend(params_to_fix)
 
-    def set_fixed_params(self, params):
+    def set_parameter_status(self, params, status):
         """
-        Set the list of parameters that should not be refined.
-        :param params: List of parameter names to be fixed.
-        """
-        self.fixed_params = params
+        Set the status of parameters to be fixed or refined.
+        :param params: List of parameter names to be updated.
+        :param status: Boolean indicating if parameters are to be fixed (True) or refined (False).
 
-    def release_parameters(self, params_to_release):
-        # params_to_release could be a list of parameter names to refine
-        self.fixed_params = [p for p in self.fixed_params if p not in params_to_release]
+        # In use:
+        refiner = RietveldRefiner(data_instance, chart_instance, model_instance)
+        refiner.set_parameter_status(['a', 'c', 'scale'], True)  # Fix these parameters
+        refiner.set_parameter_status(['b'], False)  # Release this parameter for refinement
+        """
+        for param in params:
+            if status:
+                # Fix parameters
+                if param not in self.fixed_params:
+                    self.fixed_params.append(param)
+            else:
+                # Release parameters
+                if param in self.fixed_params:
+                    self.fixed_params.remove(param)
+
 
     def refine(self):
         # Prepare parameters for least squares that are not fixed
@@ -208,7 +209,7 @@ class RietveldRefiner:
 
     
     def _count_refinable_parameters(self, params):
-        # Helper function to count the number of parameters marked for refinement
+        # (Optional) Helper method to count refinable parameters, if needed
         count = 0
         for value in params.values():
             if isinstance(value, list) and value[1]:  # If it's a refinable parameter
