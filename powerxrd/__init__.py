@@ -1,2 +1,5 @@
-from powerxrd.main import *
-from powerxrd.rietveld import Model, RietveldRefiner
+from .chart import Chart
+from .data import Data
+# from .model import Model
+# from .rietveld import RietveldRefiner
+from .utilities import braggs, scherrer, funcgauss
