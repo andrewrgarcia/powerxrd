@@ -317,9 +317,6 @@ class Chart:
             print('{}, \t  {}, \t  {} '.format(*schpeaks_[i]))
 
 
-
-
-
     def mav(self,n=1,show=False):
         '''Function for an "n" point moving average. '''
         L=int(len(self.x)//n)

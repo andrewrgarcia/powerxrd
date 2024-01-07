@@ -76,11 +76,6 @@ class Model:
     # export the model to a file, visualize the structure, etc.
         
 
-# Example usage to update lattice constant 'a' and its refinement flag
-model = Model()
-model.update_parameter('lattice_constants.a', 5.432, True)  # Update value and set to refine
-
-
 
 
 
