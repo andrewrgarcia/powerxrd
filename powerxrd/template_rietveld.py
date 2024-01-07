@@ -1,6 +1,6 @@
-import numpy as np
+26310.import numpy as np
 import matplotlib.pyplot as plt
-
+  
 from lmfit import CompositeModel, Model
 from lmfit.lineshapes import gaussian, step
 
@@ -45,6 +45,16 @@ def Structure_Factor_K(Theta, hkl,atomic_positions,N_j,f_j):
         F_K.append( N_j * f_j * np.exp ( 2 * np.pi * imag_i ) * (h*x + k*y + l*z)  * np.exp(1) - M_j )
     
     return F_K
+
+
+
+sum_component = []
+for HKL_K in HKL:
+    L_pK = LorentzPol_Factor(x,TwoTheta_M,K)
+    F_K = Structure_Factor_K(x, HKL_K,atomic_positions,N_j,f_j)
+    sum_component.extend( m_K * L_pK *  np.abs(F_K)**2  * phi * (x - Theta_k) * P_K * A  + y_bi )
+
+return scale_factor * sum_component
     
 def calculate_structure_factor(hkl, atomic_positions, sigma, fraction):
     # Placeholder for actual structure factor calculation
