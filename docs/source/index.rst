@@ -32,7 +32,7 @@ contributing to the enhancement issue on our `Issue page <https://github.com/and
 or sponsoring our project on the `main Github repository page <https://github.com/andrewrgarcia/powerxrd>`_.
 
 
-.. autoclass:: powerxrd.Rietveld
+.. autoclass:: powerxrd.RietveldRefiner
    :members: 
 
 
