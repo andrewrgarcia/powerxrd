@@ -3,19 +3,24 @@ from scipy.optimize import least_squares
 
 
 class Model:
-    def __init__(self):
+    def __init__(self, peak_shape='pseudo_voigt'):
         # Initialize with default parameters or load from a file/database
+        self.peak_shape_function = getattr(self, peak_shape),
         self.params = {
             'scale': [1.0, True],
             'overall_B': [0.0, True],
-            'lattice_constants': {
-                'a': [5.431, True],
-                'b': [5.431, True],
-                'c': [5.431, True],
-                'alpha': [90.0, False],
-                'beta': [90.0, False],
-                'gamma': [90.0, False],
+            'crystal_symmetry': {
+                'space_group': 'Pm-3m',  # Placeholder for space group symbol
+                'lattice_constants': {
+                    'a': [5.431, True],
+                    'b': [5.431, True],
+                    'c': [5.431, True],
+                    'alpha': [90.0, False],
+                    'beta': [90.0, False],
+                    'gamma': [90.0, False],
+                },
             },
+            'HKLs': [],  # will be filled by the generate_HKL method
             'FWHM_parameters': {
                 'U': [0.004, True],
                 'V': [-0.00761, False],
@@ -23,9 +28,9 @@ class Model:
                 'X': [0.01896, False]
             },
             'shape_parameters': {
-                # ... other shape parameters ...
+                'Eta_0': [0.00001, True],  # Example starting value, with True indicating it is refinable
+                'X': [0.01896, True],   # Example starting value, with True indicating it is refinable
             },
-            # ... other parameters ...
             'atomic_positions': [
                 {'element': 'Cu', 'x': [0.0, True], 'y': [0.0, False], 'z': [0.0, True], 'occupancy': [1.0, True], 'B_iso': [0.5, True]},
                 {'element': 'O', 'x': [0.5, True], 'y': [0.5, True], 'z': [0.5, True], 'occupancy': [1.0, True], 'B_iso': [0.5, True]},
@@ -38,16 +43,107 @@ class Model:
     def initial_parameters(self):
         # Return initial guess of parameters
         return self.params
+    
+
+    def gaussian(self, x, center, *args, **kwargs):
+        # Extract FWHM from parameters
+        FWHM = self.params['FWHM_parameters']['U'][0]
+        sigma = FWHM / (2 * np.sqrt(2 * np.log(2)))
+        return np.exp(-((x - center) ** 2) / (2 * sigma ** 2))
+
+    def lorentzian(self, x, center, *args, **kwargs):
+        # Extract FWHM from parameters
+        FWHM = self.params['FWHM_parameters']['U'][0]
+        gamma = FWHM / 2
+        return 1 / (1 + ((x - center) ** 2) / (gamma ** 2))
+
+    def pseudo_voigt(self, x, center, *args, **kwargs):
+        # Extract FWHM and Eta_0 from parameters
+        FWHM = self.params['FWHM_parameters']['U'][0]
+        eta = self.params['shape_parameters']['Eta_0'][0]
+        G = self.gaussian(x, center)
+        L = self.lorentzian(x, center)
+        return eta * L + (1 - eta) * G
+    
+
+    def set_peak_shape_function(self, peak_shape):
+        if hasattr(self, peak_shape):
+            self.peak_shape_function = getattr(self, peak_shape)
+            self.params['peak_shape'] = peak_shape
+        else:
+            raise ValueError(f"Peak shape function '{peak_shape}' not recognized.")
+
+
+    def generate_HKL(self):
+        space_group = self.params['crystal_symmetry']['space_group']
+        lattice = self.params['crystal_symmetry']['lattice_constants']
+        
+        # This is a placeholder function. You will need to replace it with the actual
+        # logic or a call to a crystallography library that generates the HKLs
+        # based on the space group and lattice constants.
+        def placeholder_HKL_generator(space_group, lattice):
+            # Placeholder logic to generate HKL values
+            return [(0, 0, 0)]  # Replace with actual HKL values
+
+        self.params['HKLs'] = placeholder_HKL_generator(space_group, lattice)
+
+
+    def calculate_d_spacing(self, hkl):
+        a, b, c = (self.params['crystal_symmetry']['lattice_constants'][key][0] for key in ['a', 'b', 'c'])
+        h, k, l = hkl
+        # Assuming a cubic system for simplicity; you'd adjust this for other crystal systems
+        return a / np.sqrt(h**2 + k**2 + l**2)
+
+    def lorentz_polarization_factor(self, theta):
+        wavelength = self.params['wavelength'][0]
+        return (1 + np.cos(2 * theta)**2) / (np.sin(theta)**2 * np.cos(theta))
+
+    def structure_factor(self, hkl):
+        atomic_positions = self.params['atomic_positions']
+        F = 0
+        for atom in atomic_positions:
+            x, y, z = (atom[coord][0] for coord in ['x', 'y', 'z'])
+            f = self.atomic_form_factors[atom['element']]  # This needs to be provided or calculated
+            F += f * np.exp(2 * np.pi * 1j * (hkl[0]*x + hkl[1]*y + hkl[2]*z))
+        return np.abs(F)**2
+
+    def peak_shape(self, two_theta, theta_bragg, U):
+        # This would ideally select between Gaussian, Lorentzian, or Pseudo-Voigt based on params
+        return np.exp(-4 * np.log(2) * ((two_theta - theta_bragg) / U)**2)
+
+    def background(self, two_theta):
+        # Simple linear background as a placeholder
+        bkg_params = self.params['background_params']
+        return bkg_params[0] + bkg_params[1] * two_theta
 
     def calculate_pattern(self, x_data):
-        # Calculate the diffraction pattern based on the current model parameters
-        # For demonstration, returns a simple pattern. Replace with actual calculation.
         y_calc = np.zeros_like(x_data)
-        for x in x_data:
-            # The calculation will depend on the crystal structure, peak shapes, etc.
-            # For example, calculate the intensity for each peak and sum them up.
-            # This is placeholder logic:
-            y_calc += np.random.normal(0, 0.1, size=y_calc.shape)
+        HKLs = self.params['HKLs']
+        scale_factor = self.params['scale'][0]
+        wavelength = self.params['wavelength'][0]
+
+        for i, two_theta in enumerate(x_data):
+            theta = np.radians(two_theta / 2)
+            intensity = 0
+
+            for hkl in HKLs:
+                d = self.calculate_d_spacing(hkl)
+                theta_bragg = np.arcsin(wavelength / (2 * d))
+                
+                if np.isclose(theta, theta_bragg, atol=1e-3):
+                    F = self.structure_factor(hkl)
+                    Lp = self.lorentz_polarization_factor(theta)
+                    peak_intensity = F * Lp
+                    center = np.degrees(2 * theta_bragg)  # Convert to degrees for the peak shape function
+
+                    # Dynamically call the peak shape function
+                    peak_profile = self.peak_shape_function(two_theta, center)
+
+                    intensity += peak_intensity * peak_profile
+
+            background_intensity = self.background(two_theta)
+            y_calc[i] = scale_factor * (intensity + background_intensity)
+
         return y_calc
 
 
