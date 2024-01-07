@@ -1,11 +1,10 @@
 import numpy as np
 from scipy.optimize import least_squares
-
+import spglib
 
 class Model:
     def __init__(self, peak_shape='pseudo_voigt'):
         # Initialize with default parameters or load from a file/database
-        self.peak_shape_function = getattr(self, peak_shape),
         self.params = {
             'scale': [1.0, True],
             'overall_B': [0.0, True],
@@ -38,7 +37,15 @@ class Model:
             ],
             'background_params': [0, 0],  # Example for a linear background
             # ... other parameters like peak shape parameters, etc.
-        }
+        },
+        self.lattice_matrix_functions = {
+            'triclinic': self.get_triclinic_lattice_matrix,
+            'monoclinic': self.get_monoclinic_lattice_matrix,
+            # ... other mappings ...
+            'cubic': self.get_cubic_lattice_matrix
+        },
+        self.peak_shape_function = getattr(self, peak_shape)
+
 
     def initial_parameters(self):
         # Return initial guess of parameters
@@ -78,14 +85,83 @@ class Model:
         space_group = self.params['crystal_symmetry']['space_group']
         lattice = self.params['crystal_symmetry']['lattice_constants']
         
-        # This is a placeholder function. You will need to replace it with the actual
-        # logic or a call to a crystallography library that generates the HKLs
-        # based on the space group and lattice constants.
-        def placeholder_HKL_generator(space_group, lattice):
-            # Placeholder logic to generate HKL values
-            return [(0, 0, 0)]  # Replace with actual HKL values
+        # Determine the crystal system
+        crystal_system = self.get_crystal_system(space_group)
 
-        self.params['HKLs'] = placeholder_HKL_generator(space_group, lattice)
+        # Get the appropriate lattice matrix function based on the crystal system
+        lattice_matrix_function = self.lattice_matrix_functions.get(crystal_system)
+        if not lattice_matrix_function:
+            raise ValueError(f"Lattice matrix function for '{crystal_system}' not found")
+
+        lattice_matrix = lattice_matrix_function(lattice)
+
+        # Use atomic positions and types from self.params
+        atomic_positions = self.params['atomic_positions']
+        atomic_types = [atom['element'] for atom in atomic_positions]
+
+        # Convert atomic positions to the format expected by spglib
+        positions = [(atom['x'][0], atom['y'][0], atom['z'][0]) for atom in atomic_positions]
+
+        cell = (lattice_matrix, positions, atomic_types)
+
+        # Get space group type from its symbol
+        space_group_type = spglib.get_spacegroup_type(space_group)
+
+        # Generate HKL values using spglib
+        HKLs = spglib.get_reflections(cell, space_group_type)
+
+        self.params['HKLs'] = HKLs
+
+
+    def get_crystal_system(self, space_group):
+        # Method 1: Using spglib
+        try:
+            space_group_info = spglib.get_spacegroup_type(space_group)
+            return space_group_info['crystal_system']
+        except Exception:
+            # Fallback to manual inference
+            return self.manual_infer_crystal_system(space_group)
+
+    def manual_infer_crystal_system(self, space_group):
+        # Method 2: Manual inference from space group number
+        # Define ranges for each crystal system
+        crystal_system_ranges = {
+            'triclinic': range(1, 3),
+            'monoclinic': range(3, 16),
+            'orthorhombic': range(16, 75),
+            'tetragonal': range(75, 143),
+            'trigonal': range(143, 168),
+            'hexagonal': range(168, 195),
+            'cubic': range(195, 231)
+        }
+        # Infer the crystal system
+        for system, group_range in crystal_system_ranges.items():
+            if space_group in group_range:
+                return system
+        raise ValueError("Invalid or unrecognized space group number")
+
+    
+
+    def get_triclinic_lattice_matrix(self, lattice):
+        # Return lattice matrix for triclinic system
+        # Note: Triclinic lattice matrix requires all lattice constants and angles
+        # Example placeholder, replace with actual logic
+        return [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+
+    def get_monoclinic_lattice_matrix(self, lattice):
+        # Return lattice matrix for monoclinic system
+        # Example placeholder, replace with actual logic
+        return [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+
+    # ... similar methods for other crystal systems ...
+
+    def get_cubic_lattice_matrix(self, lattice):
+        # Return lattice matrix for cubic system
+        return [
+            [lattice['a'][0], 0, 0],
+            [0, lattice['b'][0], 0],
+            [0, 0, lattice['c'][0]]
+        ]
 
 
     def calculate_d_spacing(self, hkl):
