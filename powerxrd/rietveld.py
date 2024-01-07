@@ -3,8 +3,9 @@ from scipy.optimize import least_squares
 
 
 class Model:
-    def __init__(self):
+    def __init__(self, peak_shape='pseudo_voigt'):
         # Initialize with default parameters or load from a file/database
+        self.peak_shape_function = getattr(self, peak_shape),
         self.params = {
             'scale': [1.0, True],
             'overall_B': [0.0, True],
@@ -43,6 +44,35 @@ class Model:
         # Return initial guess of parameters
         return self.params
     
+
+    def gaussian(self, x, center, *args, **kwargs):
+        # Extract FWHM from parameters
+        FWHM = self.params['FWHM_parameters']['U'][0]
+        sigma = FWHM / (2 * np.sqrt(2 * np.log(2)))
+        return np.exp(-((x - center) ** 2) / (2 * sigma ** 2))
+
+    def lorentzian(self, x, center, *args, **kwargs):
+        # Extract FWHM from parameters
+        FWHM = self.params['FWHM_parameters']['U'][0]
+        gamma = FWHM / 2
+        return 1 / (1 + ((x - center) ** 2) / (gamma ** 2))
+
+    def pseudo_voigt(self, x, center, *args, **kwargs):
+        # Extract FWHM and Eta_0 from parameters
+        FWHM = self.params['FWHM_parameters']['U'][0]
+        eta = self.params['shape_parameters']['Eta_0'][0]
+        G = self.gaussian(x, center)
+        L = self.lorentzian(x, center)
+        return eta * L + (1 - eta) * G
+    
+
+    def set_peak_shape_function(self, peak_shape):
+        if hasattr(self, peak_shape):
+            self.peak_shape_function = getattr(self, peak_shape)
+            self.params['peak_shape'] = peak_shape
+        else:
+            raise ValueError(f"Peak shape function '{peak_shape}' not recognized.")
+
 
     def generate_HKL(self):
         space_group = self.params['crystal_symmetry']['space_group']
@@ -100,12 +130,15 @@ class Model:
                 d = self.calculate_d_spacing(hkl)
                 theta_bragg = np.arcsin(wavelength / (2 * d))
                 
-                if np.isclose(theta, theta_bragg, atol=1e-3):  # Allow for some tolerance
+                if np.isclose(theta, theta_bragg, atol=1e-3):
                     F = self.structure_factor(hkl)
                     Lp = self.lorentz_polarization_factor(theta)
                     peak_intensity = F * Lp
-                    U = self.params['FWHM_parameters']['U'][0]  # Extract the U parameter for peak shape
-                    peak_profile = self.peak_shape(two_theta, np.degrees(2*theta_bragg), U)
+                    center = np.degrees(2 * theta_bragg)  # Convert to degrees for the peak shape function
+
+                    # Dynamically call the peak shape function
+                    peak_profile = self.peak_shape_function(two_theta, center)
+
                     intensity += peak_intensity * peak_profile
 
             background_intensity = self.background(two_theta)
