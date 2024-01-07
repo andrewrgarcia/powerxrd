@@ -93,6 +93,19 @@ class Chart:
         self.K          = 0.9       
         self.lambdaKa   = 0.15406
         self.lambdaKi   = 0.139
+        self.background_points = None  # New attribute to store background points
+
+    def set_background_points(self, background_points):
+        self.background_points = background_points
+
+    def interpolate_background(self):
+        if self.background_points is not None:
+            # Implement your chosen interpolation method here
+            # For example, using numpy's interpolation functions:
+            x_bg_points, y_bg_points = zip(*self.background_points)
+            interpolated_bg = np.interp(self.x, x_bg_points, y_bg_points)
+            self.y -= interpolated_bg  # Subtract the interpolated background from the y data
+
 
     def local_max(self,xrange=[12,13]):
         '''Maximum finder in specified xrange
