@@ -58,15 +58,22 @@ class Model:
         return y_calc
 
 
-    def update_parameter(self, param_path, value, refine_flag=None):
-        """Update the value of a parameter by its path, optionally setting its refine flag."""
-        keys = param_path.split('.')
-        param = self.params
-        for key in keys[:-1]:
-            param = param[key]
-        param[keys[-1]][0] = value
-        if refine_flag is not None:
-            param[keys[-1]][1] = refine_flag
+    def update_parameters(self, updated_params):
+        """
+        Batch update the model parameters with new values from the refinement process.
+        :param updated_params: A dictionary of updated parameters.
+        """
+        def update_recursive(params, updates):
+            for key, value in updates.items():
+                if isinstance(value, dict):
+                    # If the value is a dictionary, recurse into it
+                    update_recursive(params[key], value)
+                else:
+                    # Update the parameter value and keep the refine_flag unchanged
+                    current_value, refine_flag = params[key]
+                    params[key] = [value[0], refine_flag]
+
+        update_recursive(self.params, updated_params)
     
     def add_atom(self, atomic_position, atom_type):
         # Method to add an atom to the atomic_positions
