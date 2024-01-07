@@ -1,0 +1,5 @@
+powerxrd
+matplotlib
+# -e .
+sphinx
+sphinx_rtd_theme
