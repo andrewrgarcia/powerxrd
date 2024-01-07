@@ -82,33 +82,54 @@ model.update_parameter('lattice_constants.a', 5.432, True)  # Update value and s
 
 
 
+
+
 class RietveldRefiner:
-    def __init__(self, x_data, y_data, model):
-        self.x_data = x_data
-        self.y_data = y_data
-        self.model = model
-        self.parameters = model.initial_parameters()
-        self.fixed_params = []
+    def __init__(self, data_instance, chart_instance, model_instance):
+        self.data = data_instance
+        self.chart = chart_instance
+        self.model = model_instance
+        self.parameters = model_instance.initial_parameters()  # Store initial model parameters
+        self.fixed_params = []  # Keep track of which parameters are fixed
 
     def fix_parameters(self, params_to_fix):
         # params_to_fix could be a list of parameter names to fix
         self.fixed_params.extend(params_to_fix)
 
+    def set_fixed_params(self, params):
+        """
+        Set the list of parameters that should not be refined.
+        :param params: List of parameter names to be fixed.
+        """
+        self.fixed_params = params
+        
     def release_parameters(self, params_to_release):
         # params_to_release could be a list of parameter names to refine
         self.fixed_params = [p for p in self.fixed_params if p not in params_to_release]
 
     def refine(self):
+        # Prepare parameters for least squares that are not fixed
         params_to_refine = self._get_refinable_parameters(self.parameters)
-        packed_initial_params = self._pack_parameters(params_to_refine)
+
+        # Interpolate and subtract the background before starting the refinement
+        self.chart.interpolate_background()
+
+        # Get the data points marked for refinement
+        x_refinable, y_refinable = self.data.get_refinable_data()
+
+        # Perform the least squares optimization
         result = least_squares(
             self._residuals, 
-            packed_initial_params, 
-            args=(self.x_data, self.y_data)
+            x0=self._pack_parameters(params_to_refine), 
+            args=(x_refinable, y_refinable)
         )
-        # Unpack the results and update the model parameters
+        
+        # Unpack results back into model parameters
         updated_params, _ = self._unpack_parameters(result.x, params_to_refine)
         self.model.update_parameters(updated_params)
+        
+        # The method could return result and updated_params if needed
+        return result, updated_params
 
     def _get_refinable_parameters(self, params):
         # Filter out the parameters not marked for refinement
@@ -122,11 +143,13 @@ class RietveldRefiner:
 
     def _residuals(self, packed_params, x_data, y_data):
         # Unpack parameters and update the model
-        unpacked_params = self._unpack_parameters(packed_params, self.parameters)
-        self.model.update_parameters(unpacked_params)
+        updated_params, _ = self._unpack_parameters(packed_params, self.parameters)
+        self.model.update_parameters(updated_params)
         
-        # Calculate the difference between observed and calculated intensities
+        # Calculate the pattern only for the points marked for refinement
         y_calc = self.model.calculate_pattern(x_data)
+        
+        # Calculate residuals
         residuals = y_data - y_calc
         return residuals
 
