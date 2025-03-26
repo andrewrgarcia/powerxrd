@@ -138,6 +138,10 @@ class Chart:
         FWHM = FWHM_deg*np.pi/180
         # print('\nFWHM == sigma*2*sqrt(2*ln(2)): {} degrees'.format(FWHM_deg))
 
+        # Store FWHM as attribute // user request :: hnmachado github issue/8
+        self.FWHM_deg = FWHM_deg
+        self.FWHM_rad = FWHM
+
         HWMIN = sigma*np.sqrt(2*np.log((50)))
         # print('\nHalf-width Minimum (HWMIN) (1/50 max) == sigma*sqrt(2*ln(50)): {} degrees'.\
         #     format(HWMIN))
