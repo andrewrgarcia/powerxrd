@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "powerxrd"
-version = "2.3.0"
+version = "2.3.1"
 description = "Simple tools to handle powder XRD (and XRD) data with Python."
 authors = ["andrewrgarcia <garcia.gtr@gmail.com>"]
 license = "MIT"
