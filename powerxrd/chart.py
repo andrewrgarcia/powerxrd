@@ -243,60 +243,87 @@ class Chart:
             print('{}, \t  {}, \t  {} '.format(*schpeaks_[i]))
 
 
-    def mav(self,n=1,show=False):
-        '''Function for an "n" point moving average. '''
-        L=int(len(self.x)//n)
-        newy=np.zeros(L)
-        for i in range(L):
-            k=0
-            while k < n:
-                newy[i] += self.y[(i*n)+k]
-                k += 1
-    #           print(i)
-            newy[i]=newy[i]/n
-
-        newx=np.zeros(L)
-        for i in range(L):
-            newx[i] = self.x[i*n]
-
-        'update'
-        self.x, self.y = newx,newy
-
-        if show:
-            plt.plot(self.x,self.y)
-
-        return newx,newy
-
-
     def XRD_int_ratio(self,xR1=[8.88,9.6],xR2=[10.81,11.52]):
         '''Calculate relative peak intensity (i.e. comparing one peak to another)'''
         # 'XRD b/t two intensities ratio'
         return Chart(self.x, self.y).local_max(xR2)[1]/Chart(self.x, self.y).local_max(xR1)[1]
 
 
+    def mav(self, n=1, inplace=False, show=False, return_x=True):
+        """
+        Apply an `n`-point moving average to the XRD data.
 
-    def backsub(self,tol=1,show=False):
-        '''
-        Background subtraction operation.This function is a running conditional statement 
-        which evaluates whether a small increase in the x-direction will increase the magnitude of the 
-        y variable beyond a certain tolerance.
+        Parameters
+        ----------
+        n : int, optional
+            Number of points to average over (window size). Must be >= 1. Default is 1.
+        inplace : bool, optional
+            If True, update self.x and self.y with the smoothed data. Default is False.
+        show : bool, optional
+            If True, display the smoothed data using matplotlib.
+        return_x : bool, optional
+            If False, only return the smoothed y-data. Useful for post-processing. Default is True.
+
+        Returns
+        -------
+        tuple or ndarray or Chart
+            Returns (newx, newy) if inplace is False and return_x is True,
+            newy if return_x is False,
+            or self if inplace is True.
+        """
+        if n < 1:
+            raise ValueError("n must be >= 1 for a moving average.")
+
+        # Use convolution for efficiency
+        kernel = np.ones(n) / n
+        newy = np.convolve(self.y, kernel, mode='valid')
+
+        # Match x length (drop n//2 points from start and end)
+        newx = self.x[:len(newy)]  # Simplified assumption: evenly spaced
+
+        if show:
+            plt.plot(newx, newy)
+            plt.title(f"{n}-point Moving Average")
+            plt.xlabel("2θ (deg)")
+            plt.ylabel("Intensity")
+
+        if inplace:
+            self.x, self.y = newx, newy
+            return self
+        else:
+            if return_x:
+                return newx, newy
+            else:
+                return newy
+
+
+
+    def backsub(self, tol=1, inplace=False, show=False):
+        """
+        Perform a simple tolerance-based background subtraction.
+
+        This algorithm subtracts local minima based on a rolling comparison with a forward-offset window,
+        zeroing out data points that fall below a tolerance threshold.
 
         Parameters
         ----------
         tol : float, optional
-            Tolerance for background subtraction.
-            The function evaluates whether a small increase in the x-direction will increase the magnitude
-            of the y variable beyond a certain tolerance value. This tolerance value is defined as a
-            percentage of the y variable at each point. Peaks above this tolerance are considered and
-            their background is removed.
-            Default value is 1.
+            Tolerance threshold. Background is subtracted if a forward intensity exceeds the current
+            point by more than `tol` times. Default is 1.
+        inplace : bool, optional
+            If True, modifies self.y in-place. Default is False.
         show : bool, optional
-            Whether to show the plot of the XRD chart.
-            Default value is False.
-        '''
-        
+            If True, plot the resulting background-subtracted data.
+
+        Returns
+        -------
+        tuple or Chart
+            (self.x, backsub_y) if inplace is False, otherwise returns self.
+        """
+
         L=len(self.y)
-        lmda = int(0.50*L/(self.x[0]-self.x[L-1]))         #   'approx. # points for half width of peaks'
+        # Approximate half-width in index space (reverse-sorted check)
+        lmda = int(0.50*L/(self.x[0]-self.x[L-1]))         
 
         backsub_y=np.zeros(L)
         for i in range(L):
@@ -306,11 +333,12 @@ class Chart:
                 if self.y[(i+lmda)%L] < self.y[i]:
                     backsub_y[(i+lmda)%L] = 0
         
-        'update'
-        self.x = self.x
-        self.y = backsub_y
-
         if show:
             plt.plot(self.x,self.y)
 
-        return self.x,backsub_y
+        'update'
+        if inplace:
+            self.y = backsub_y
+            return self
+        else:
+            return self.x, backsub_y
