@@ -6,7 +6,7 @@
 A Python package for parsing, visualizing, and analyzing powder XRD data – now at **v3.0.0**, and still somehow free.  
 The only known open-source GitHub project with an in-progress Rietveld refinement method that isn’t locked in someone's grad school folder.
 
-<img src="https://raw.githubusercontent.com/andrewrgarcia/powerxrd/main/powerxrd.svg" width="400">
+<img src="https://raw.githubusercontent.com/andrewrgarcia/powerxrd/refs/heads/main/docs/img/icon_xrd.png" width="400">
 
 ---
 
