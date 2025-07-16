@@ -44,7 +44,6 @@ def selective_objective(x, model, refine_keys, x_exp, y_exp):
     return y_exp - y_calc
 
 
-
 def refine(model, x_exp, y_exp, refine_keys, print_stage=True, save_params=None):
     """
     Run a least-squares refinement on only the selected parameters.
@@ -52,7 +51,7 @@ def refine(model, x_exp, y_exp, refine_keys, print_stage=True, save_params=None)
     """
     x0 = pack_params(model.params, refine_keys)
     if print_stage:
-        print("Refining parameters:", refine_keys)
+        print("\n\nRefining parameters:", refine_keys)
         print("Initial values:", x0)
     result = least_squares(
         selective_objective, x0, args=(model, refine_keys, x_exp, y_exp)
@@ -84,53 +83,54 @@ def plot_fit(model, x_exp, y_exp, y_fit):
     print("Refined parameters:", model.param_dict())
 
 
+if __name__ == "__main__":
+    from powerxrd.model import CubicModel
 
-model = CubicModel()  # Or however your model is defined
+    model = CubicModel()  # Just doing cubicModels now
 
-# Initial guess
+    # Initial guess
+    model.params = {
+        "a": 4.0,        # Lattice constant (Å)
+        "U": 0.005,      # Caglioti U (peak width, radians²)
+        "W": 0.005,      # Caglioti W (peak width, radians²)
+        "scale": 1000.0, # Scale factor
+        "bkg_slope": 0.0,
+        "bkg_intercept": 0.0
+    }
 
-model.params = {
-    "a": 4.0,        # Lattice constant (Å)
-    "U": 0.005,      # Caglioti U (peak width, radians²)
-    "W": 0.005,      # Caglioti W (peak width, radians²)
-    "scale": 1000.0, # Scale factor
-    "bkg_slope": 0.0,
-    "bkg_intercept": 0.0
-}
+    print("Initial parameters:", model.params)
 
-print("Initial parameters:", model.params)
+    # Load experimental data
+    x_exp, y_exp = load_data('synthetic-data/sample1.xy')
+    x_exp, y_exp = load_data()
+    saved_stages = []
 
-# Load experimental data
-x_exp, y_exp = load_data('synthetic-data/sample1.xy')
-x_exp, y_exp = load_data()
-saved_stages = []
-
-# Stage 1: Refine only scale and background
-refine(model, x_exp, y_exp, ['scale'], save_params=saved_stages)
-plot_fit(model, x_exp, y_exp, model.pattern(x_exp))
-
-
-refine(model, x_exp, y_exp, ['bkg_intercept', 'bkg_slope'], save_params=saved_stages)
-plot_fit(model, x_exp, y_exp, model.pattern(x_exp))
+    # Stage 1: Refine only scale and background
+    refine(model, x_exp, y_exp, ['scale'], save_params=saved_stages)
+    plot_fit(model, x_exp, y_exp, model.pattern(x_exp))
 
 
-# Stage 2: Refine lattice constant
-refine(model, x_exp, y_exp, ['a'], save_params=saved_stages)
-plot_fit(model, x_exp, y_exp, model.pattern(x_exp))
-
-# Stage 2: Refine lattice constant
-model.params["a"] = 3.98
-refine(model, x_exp, y_exp, ['a'], save_params=saved_stages)
-plot_fit(model, x_exp, y_exp, model.pattern(x_exp))
+    refine(model, x_exp, y_exp, ['bkg_intercept', 'bkg_slope'], save_params=saved_stages)
+    plot_fit(model, x_exp, y_exp, model.pattern(x_exp))
 
 
-# Stage 3: Refine profile parameters
-refine(model, x_exp, y_exp, ['U', 'W'], save_params=saved_stages)
-plot_fit(model, x_exp, y_exp, model.pattern(x_exp))
+    # Stage 2: Refine lattice constant
+    refine(model, x_exp, y_exp, ['a'], save_params=saved_stages)
+    plot_fit(model, x_exp, y_exp, model.pattern(x_exp))
 
-# Stage 4: Refine all together
-refine(model, x_exp, y_exp, ['scale', 'a', 'U', 'W', 'bkg_intercept', 'bkg_slope'], save_params=saved_stages)
-plot_fit(model, x_exp, y_exp, model.pattern(x_exp))
+    # Stage 2: Refine lattice constant
+    model.params["a"] = 3.93
+    refine(model, x_exp, y_exp, ['a'], save_params=saved_stages)
+    plot_fit(model, x_exp, y_exp, model.pattern(x_exp))
+
+
+    # Stage 3: Refine profile parameters
+    refine(model, x_exp, y_exp, ['U', 'W'], save_params=saved_stages)
+    plot_fit(model, x_exp, y_exp, model.pattern(x_exp))
+
+    # Stage 4: Refine all together
+    refine(model, x_exp, y_exp, ['scale', 'a', 'U', 'W', 'bkg_intercept', 'bkg_slope'], save_params=saved_stages)
+    plot_fit(model, x_exp, y_exp, model.pattern(x_exp))
 
 
 
