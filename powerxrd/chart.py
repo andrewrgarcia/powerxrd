@@ -100,8 +100,12 @@ class Chart:
         '''Fit of a Gaussian curve ("bell curve") to raw x-y data'''
         meanest = self.x[list(self.y).index(max(self.y))]
         sigest = meanest - min(self.x)
-        popt, pcov = optimize.curve_fit(funcgauss,self.x,self.y,p0 = [min(self.y),max(self.y),meanest,sigest])
-        
+        popt, pcov = optimize.curve_fit(
+            funcgauss, self.x, self.y,
+            p0=[min(self.y), max(self.y), meanest, sigest],
+            maxfev=5000  # Prevent early failure
+        )
+
         if verbose:
             print('\n-Gaussian fit results-')
             print('y-shift {}\namplitude {}\nmean {}\nsigma {}'.format(*popt))
