@@ -1,5 +1,6 @@
-powerxrd
-matplotlib
-# -e .
-sphinx
-sphinx_rtd_theme
+sphinx>=6.0
+sphinx_rtd_theme>=1.2
+matplotlib>=3.0
+numpy
+scipy
+pandas

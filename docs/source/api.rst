@@ -29,23 +29,18 @@ The Chart class
    .. automethod:: __init__
 
 
-Rietveld Refinement (in progress)
+Refinement Interfaces
 -----------------------------------------------
 
-The Model class
+The CubicModel class
 ..................................
-.. autoclass:: powerxrd.Model
+.. autoclass:: powerxrd.model.CubicModel
    :members: 
-   
-   .. automethod:: __init__
 
-The RietveldRefiner class
+The RefinementWorkflow class
 ..................................
-.. autoclass:: powerxrd.RietveldRefiner
+.. autoclass:: powerxrd.RefinementWorkflow
    :members: 
-   
-   .. automethod:: __init__
-
 
 
 .. autosummary::

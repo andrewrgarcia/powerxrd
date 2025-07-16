@@ -1,30 +1,88 @@
 Rietveld refinement
-=======================================
+===================
 
 Rietveld refinement is a method for refining crystal structures from X-ray and neutron powder diffraction data. 
-The method was developed by Hugo Rietveld in 1969 and is widely used in materials science to determine the 
-crystal structure of crystalline materials. The Rietveld method involves modeling the diffraction pattern of a 
-crystal using a combination of known structural parameters and refined parameters that describe any deviations
-from the ideal structure. The refinement process involves adjusting these parameters to minimize the difference 
-between the observed and calculated diffraction patterns. The refined crystal structure can then be used to gain insights 
-into the properties and behavior of the material under investigation.
+Originally developed by Hugo Rietveld in 1969, it's now a staple in materials science for analyzing crystalline phases. 
+The method works by modeling an entire diffraction pattern using known structural parameters, which are then adjusted to minimize 
+the difference between the observed and calculated data.
 
-
-The Rietveld equation
+Basic Usage with `CubicModel`
 -----------------------------
 
-.. math::
+The following example demonstrates a basic refinement workflow using the built-in `CubicModel` and the `RefinementWorkflow` class:
 
-    S_y = \sum_i w_i \left( y_i - y_{cal} \right)
+.. code-block:: python
 
-    y_{cal} = s \sum_{K} m_K L_{pK} | F_K |^2 \phi (2\theta_i - 2\theta_k) P_K A + y_{bi}
+   import powerxrd as xrd
+   from powerxrd.model import CubicModel
+   import powerxrd.refine as rr
 
-    F_K = \sum_j N_j f_j \exp \left[ 2\pi i (h x_j + k y_j + l z_j) \right] \exp \left[ -M_j \right]
+   model = CubicModel()
 
-    M_j = 8 \pi^2 u_s ^2 sin^2 \theta / \lambda^2
-    
+   # Load and preprocess synthetic data
+   x_exp, y_exp = rr.load_data("synthetic-data/sample1.xy")
+   x_exp, y_exp = xrd.Chart(x_exp, y_exp).backsub()
+
+   # Define starting parameters
+   model.params = {
+       "a": 6.0,
+       "U": 0.005,
+       "W": 0.005,
+       "scale": 1000.0,
+       "bkg_slope": 0.0,
+       "bkg_intercept": 0.0
+   }
+
+   rw = xrd.RefinementWorkflow(model, x_exp, y_exp)
+   rw.refine(['scale'])        # Stage 1: refine scale
+   rw.plot_fit()
+
+   rw.refine(['a', 'U', 'W'])  # Stage 2: refine lattice + profile
+   rw.plot_fit()
+   rw.save_log('my_stages.json')
+
+This modular API is still under active development and currently supports only **cubic systems** — we’re keeping it simple for now.
+
+Getting Started: `hello_rietveld.py`
+------------------------------------
+
+For new users, we recommend starting with the `hello_rietveld*.py` scripts located in the root directory.
+
+These examples walk through a **Minimum Viable Rietveld (MVR)** refinement:
+- Load synthetic XRD data
+- Apply background subtraction
+- Initialize a `CubicModel`
+- Refine a single parameter (e.g., `scale`)
+- Plot the fit against experimental data
 
 
+Refinement Example
+------------------
+
+Below is the output from a minimal refinement session using the `hello_rietveld_long.py` workflow. 
+It shows both:
+
+- The experimental vs. refined pattern (left plot)
+- The live parameter optimization and fit statistics (right terminal)
+
+.. image:: ../img/refine_terminal_and_plot.png
+   :width: 750
+   :alt: Full minimal Rietveld refinement session
+   :align: center
+
+This run used just a handful of parameters — initially refining only `scale`, then adding `a`, `U`, `W`, and background terms. 
+Despite the simplicity, the fit successfully reconstructs synthetic XRD data using a `CubicModel`.
+
+Want to try it yourself? Run:
+
+.. code-block:: bash
+
+   python examples/hello_rietveld_long.py
+
+For more extensive workflows, see the :doc:`usage` section — or check out the YouTube tutorials (no TikTok, we promise).  
+
+.. note::
+   These scripts are not meant for publication-grade results. They're meant to be clicked, read, broken, and learned from.
 
 
 Literature

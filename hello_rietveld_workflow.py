@@ -8,10 +8,10 @@ x_exp, y_exp = xrd.Chart(x_exp, y_exp).backsub()
 
 # Initial guess
 model.params = {
-    "a": 6.0,        # Lattice constant (Å)
-    "U": 0.005,      # Caglioti U (peak width, radians²)
-    "W": 0.005,      # Caglioti W (peak width, radians²)
-    "scale": 1000.0, # Scale factor
+    "a": 6.0,               # Lattice constant (Å)
+    "U": 0.005,             # Caglioti U (peak width, radians²)
+    "W": 0.005,             # Caglioti W (peak width, radians²)
+    "scale": 1000.0,        # Scale factor
     "bkg_slope": 0.0,
     "bkg_intercept": 0.0
 }
