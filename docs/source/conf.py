@@ -10,8 +10,8 @@ project = 'powerxrd'
 copyright = '2023, Andrew Garcia'
 author = 'Andrew Garcia, Ph.D.'
 
-release = '2.3'
-version = '2.3.0'
+release = '3.0'
+version = '3.0.0'
 
 # -- General configuration
 
