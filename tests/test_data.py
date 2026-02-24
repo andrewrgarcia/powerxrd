@@ -1,6 +1,8 @@
-import powerxrd as xrd
+
 import numpy as np
-import os
+
+import powerxrd as xrd
+
 
 def test_importfile_csv():
     d = xrd.Data('synthetic-data/sample1.csv')

@@ -1,8 +1,9 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import scipy.optimize as optimize
 
-from .utilities import funcgauss, scherrer, braggs
+from .utilities import funcgauss, scherrer
+
 
 class Chart:
 
@@ -63,7 +64,7 @@ class Chart:
         max_x = xseg[imax]
         max_y = yseg[imax]
 
-        print('local_max -- max x: {} max y: {}'.format(max_x,max_y))
+        print(f'local_max -- max x: {max_x} max y: {max_y}')
         return max_x, max_y
 
     def emission_lines(self, xrange_Ka=[10,20], show = True):
@@ -87,10 +88,10 @@ class Chart:
 
         if show:
             plt.vlines(twothet_Ka_deg,0,int_Ka, colors='k', linestyles='solid', \
-                    label=r'K$\alpha$; $\theta$ = {} '.format(round(twothet_Ka_deg,2)))
+                    label=rf'K$\alpha$; $\theta$ = {round(twothet_Ka_deg,2)} ')
             plt.vlines((twothet_Ka_deg+twothet_Ki_deg)/2,0,int_Ka, colors='k', linestyles='--', label='')
             plt.vlines(twothet_Ki_deg,0,int_Ka, colors='r', linestyles='solid',\
-                    label=r'K$\beta$; $\theta$ = {} '.format(round(twothet_Ki_deg,2)))
+                    label=rf'K$\beta$; $\theta$ = {round(twothet_Ki_deg,2)} ')
         else:
 
             return twothet_Ki_deg
@@ -109,7 +110,7 @@ class Chart:
         if verbose:
             print('\n-Gaussian fit results-')
             print('y-shift {}\namplitude {}\nmean {}\nsigma {}'.format(*popt))
-            print('covariance matrix \n{}'.format(pcov))
+            print(f'covariance matrix \n{pcov}')
         return popt
 
         
@@ -146,7 +147,7 @@ class Chart:
         self.FWHM_deg = FWHM_deg
         self.FWHM_rad = FWHM
 
-        HWMIN = sigma*np.sqrt(2*np.log((50)))
+        HWMIN = sigma*np.sqrt(2*np.log(50))
         # print('\nHalf-width Minimum (HWMIN) (1/50 max) == sigma*sqrt(2*ln(50)): {} degrees'.\
         #     format(HWMIN))
 
@@ -167,12 +168,9 @@ class Chart:
         if verbose:
             print('\nSchPeak: Scherrer width calc. for peak in range of [{},{}]'.\
                                     format(*xrange))
-            print('\nFWHM == sigma*2*sqrt(2*ln(2)): {} degrees'.\
-                                    format(FWHM_deg))
-            print('K (shape factor): {}\nK-alpha: {} nm \nmax 2-theta: {} degrees'.\
-                                    format(self.K,self.lambdaKa,max_x))
-            print('\nSCHERRER WIDTH: {} nm'.\
-                                    format(Sch))
+            print(f'\nFWHM == sigma*2*sqrt(2*ln(2)): {FWHM_deg} degrees')
+            print(f'K (shape factor): {self.K}\nK-alpha: {self.lambdaKa} nm \nmax 2-theta: {max_x} degrees')
+            print(f'\nSCHERRER WIDTH: {Sch} nm')
 
         
         if show:

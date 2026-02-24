@@ -1,3 +1,7 @@
 # synthetic-data
 
-This data was synthetically generated with a random peak generator algorithm which does random broadening and random intensities at specific locations. It is not real experimental data. 
+Synthetic powder diffraction patterns generated for testing and demonstration.
+
+These datasets are not real experimental measurements.
+They are produced using randomized peak positions, intensities, and broadenings
+to validate preprocessing and refinement routines.

@@ -1,5 +1,7 @@
 import numpy as np
+
 from powerxrd import braggs, scherrer
+
 
 def test_braggs_scalar():
     result = braggs(30.0, lmda=1.54, is_scalar=True)  # returns d-spacing

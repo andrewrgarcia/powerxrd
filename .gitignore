@@ -2,12 +2,9 @@ __pycache__
 *.egg-info/
 venv/
 dist/
-rawtest.py
-vectorfit.py
-
-notes.txt
-draft.py
-
 docs/build
 
-show.txt
+# Conversation Control
+.fur
+chats/
+SHOW.md

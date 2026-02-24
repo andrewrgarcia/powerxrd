@@ -1,6 +1,8 @@
-import pytest
 import numpy as np
+import pytest
+
 import powerxrd as xrd
+
 
 @pytest.fixture
 def dummy_chart():

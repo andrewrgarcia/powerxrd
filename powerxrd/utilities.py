@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def braggs(twotheta, lmda=1.54, is_scalar=False):
     '''
     Calculate interplanar spacing "d_hkl" from Bragg's law.

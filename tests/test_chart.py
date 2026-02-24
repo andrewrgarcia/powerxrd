@@ -1,5 +1,7 @@
 import pytest
+
 import powerxrd as xrd
+
 
 def test_mav_output_shape(dummy_chart):
     x, y = dummy_chart.mav(n=5)
