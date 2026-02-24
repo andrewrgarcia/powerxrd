@@ -51,9 +51,10 @@ python_version = "3.10"
 warn_return_any = true
 ignore_missing_imports = true
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "ruff",
     "mypy",
-    "pytest"
+    "pytest",
+    "twine"
 ]
