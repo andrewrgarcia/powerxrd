@@ -1,0 +1,41 @@
+# `makers <task>` (or `cargo make <task>`). Same on Windows, Linux and macOS.
+#
+# Every task goes through `uv run`, which builds the environment from
+# pyproject.toml and uv.lock on first use. Nothing to activate.
+#
+# Nothing here rewrites code: lint reports, it never fixes, and there is no
+# formatter task. `uv run ruff format .` exists if you ever want it by hand.
+
+[config]
+skip_core_tasks = true
+default_to_workspace = false
+
+[tasks.setup]
+description = "Create the environment with runtime and dev dependencies"
+command = "uv"
+args = ["sync"]
+
+[tasks.test]
+description = "Run the test suite"
+command = "uv"
+args = ["run", "pytest"]
+
+[tasks.lint]
+description = "Correctness only (undefined names, unused variables, syntax errors); reports, never fixes"
+command = "uv"
+args = ["run", "ruff", "check", ".", "--select", "F,E9", "--ignore", "F401"]
+
+[tasks.type]
+description = "Type-check the package with mypy"
+command = "uv"
+args = ["run", "mypy", "powerxrd"]
+
+[tasks.run]
+description = "Run the long Rietveld example"
+command = "uv"
+args = ["run", "python", "examples/hello_rietveld_long.py"]
+
+[tasks.build]
+description = "Build the wheel and sdist into dist/"
+command = "uv"
+args = ["build"]

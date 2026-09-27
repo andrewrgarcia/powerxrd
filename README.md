@@ -132,35 +132,19 @@ uv run python examples/hello_rietveld_long.py
 
 ## 🧪 Development
 
-Run tests:
+Tasks run through [cargo-make](https://github.com/sagiegurari/cargo-make), so they
+work the same on Windows, Linux and macOS:
 
 ```bash
-make test
+makers test     # pytest
+makers lint     # correctness only; reports, never rewrites code
+makers type     # mypy
+makers run      # examples/hello_rietveld_long.py
+makers build    # wheel + sdist into dist/
 ```
 
-Lint:
-
-```bash
-make lint
-```
-
-Format:
-
-```bash
-make format
-```
-
-Type check:
-
-```bash
-make type
-```
-
-Build package:
-
-```bash
-make build
-```
+Each task is a plain `uv run ...` line in `Makefile.toml`, so without cargo-make
+you can run the same command directly.
 
 ---
 
